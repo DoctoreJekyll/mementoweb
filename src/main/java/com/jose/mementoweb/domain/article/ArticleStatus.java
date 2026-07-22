@@ -1,4 +1,4 @@
-package com.jose.mementoweb.domain;
+package com.jose.mementoweb.domain.article;
 
 public enum ArticleStatus {
     DRAFT,
