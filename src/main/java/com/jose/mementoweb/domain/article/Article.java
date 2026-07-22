@@ -14,15 +14,21 @@ import jakarta.persistence.Table;
 public class Article {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    
+    @Column(nullable = false, length = 255)
     private String title;
-    @Column
+
+    @Column(length = 255)
     private String pretitle;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String excerpt;
-    @Column
+
+    @Column(columnDefinition = "TEXT")
     private String body;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
     private ArticleStatus status;
 
     protected Article() {
