@@ -1,12 +1,33 @@
 package com.jose.mementoweb.domain.article;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "articles")
 public class Article {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String title;
+    @Column
     private String pretitle;
+    @Column
     private String excerpt;
+    @Column
     private String body;
+    @Enumerated(EnumType.STRING)
     private ArticleStatus status;
+
+    protected Article() {
+        // JPA requires a default constructor
+    }
 
     public Article(String title) {
         validateTitle(title);
