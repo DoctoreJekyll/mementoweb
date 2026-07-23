@@ -3,16 +3,22 @@ package com.jose.mementoweb.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.dto.CreateArticleRequest;
-import com.jose.mementoweb.dto.CreateArticleResponse;
+import com.jose.mementoweb.dto.UpdateArticleRequest;
+import com.jose.mementoweb.dto.AdminArticleResponse;
 import com.jose.mementoweb.service.ArticleService;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/admin/articles")
@@ -25,10 +31,25 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
+    public ResponseEntity<AdminArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
         Article savedArticle = articleService.createArticle(request.title());
-        CreateArticleResponse response = CreateArticleResponse.from(savedArticle);
+        AdminArticleResponse response = AdminArticleResponse.from(savedArticle);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AdminArticleResponse> getArticle(@PathVariable Long id) {
+        Article article = articleService.getArticleById(id).get();
+        AdminArticleResponse response = AdminArticleResponse.from(article);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AdminArticleResponse> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
+        Article updatedArticle = articleService.updateArticle(id, request.title(), request.pretitle(), request.excerpt(), request.body());
+        AdminArticleResponse response = AdminArticleResponse.from(updatedArticle);
+        return ResponseEntity.ok(response);
+    }
+    
 
 }
