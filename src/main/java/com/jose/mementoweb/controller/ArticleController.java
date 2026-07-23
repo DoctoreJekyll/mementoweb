@@ -1,5 +1,6 @@
 package com.jose.mementoweb.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +26,9 @@ public class ArticleController {
 
     @PostMapping
     public ResponseEntity<CreateArticleResponse> createArticle(@Valid @RequestBody CreateArticleRequest request) {
-        Article article = new Article(request.title());
-        Article savedArticle = articleService.createArticle(article);
+        Article savedArticle = articleService.createArticle(request.title());
         CreateArticleResponse response = CreateArticleResponse.from(savedArticle);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.repository.ArticleRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ArticleService {
@@ -20,7 +20,9 @@ public class ArticleService {
 
 
     @Transactional
-    public Article createArticle(Article article) {
+    public Article createArticle(String title) {
+        Article article = new Article(title);
+
         return articleRepository.save(article);
     }
 
