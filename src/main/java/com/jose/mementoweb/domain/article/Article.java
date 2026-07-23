@@ -70,7 +70,7 @@ public class Article {
 
     private void validateTitle(String title) {
         if (title == null || title.isBlank()) {
-            throw new ArticleStateException("Title cannot be null or blank");
+            throw new IllegalArgumentException("Title cannot be null or blank");
         }
     }
 
@@ -114,8 +114,12 @@ public class Article {
 
     public void publish() {
 
-        if (this.status == ArticleStatus.PUBLISHED) {
-            throw new ArticleStateException("Only draft or withdrawn articles can be published");
+        if (this.status != ArticleStatus.DRAFT
+                && this.status != ArticleStatus.WITHDRAWN) {
+
+            throw new ArticleStateException(
+                "Only draft or withdrawn articles can be published"
+            );
         }
 
         if (!isReadyToPublish()) {

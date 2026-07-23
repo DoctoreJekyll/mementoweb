@@ -48,6 +48,22 @@ public class ArticleController {
         AdminArticleResponse response = AdminArticleResponse.from(updatedArticle);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}/publish")
+    public ResponseEntity<AdminArticleResponse> publishArticle(@PathVariable Long id) {
+        Article article = articleService.publishArticle(id);
+        AdminArticleResponse response = AdminArticleResponse.from(article);
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<AdminArticleResponse> withdrawArticle(@PathVariable Long id) {
+        Article article = articleService.withdrawArticle(id);
+        AdminArticleResponse response = AdminArticleResponse.from(article);
+        return ResponseEntity.ok(response);
+    }
+    
     
 
 }

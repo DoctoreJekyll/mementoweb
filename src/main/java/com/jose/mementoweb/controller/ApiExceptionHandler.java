@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jose.mementoweb.exception.ArticleNotFoundException;
+import com.jose.mementoweb.exception.ArticleStateException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -20,6 +21,20 @@ public class ApiExceptionHandler {
         );
 
         problem.setTitle("Article not found");
+
+        return problem;
+    }
+
+    @ExceptionHandler(ArticleStateException.class)
+    public ProblemDetail handleArticleStateException(
+            ArticleStateException exception) {
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+            HttpStatus.CONFLICT,
+            exception.getMessage()
+        );
+
+        problem.setTitle("Article article state");
 
         return problem;
     }
