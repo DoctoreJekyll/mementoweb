@@ -1,5 +1,7 @@
 package com.jose.mementoweb.domain.article;
 
+import com.jose.mementoweb.exception.ArticleStateException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -68,7 +70,7 @@ public class Article {
 
     private void validateTitle(String title) {
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Title cannot be null or blank");
+            throw new ArticleStateException("Title cannot be null or blank");
         }
     }
 
@@ -83,7 +85,7 @@ public class Article {
 
     public void changeExcerpt(String excerpt) {
         if (this.status == ArticleStatus.PUBLISHED && valueIsNullOrBlank(excerpt)) {
-            throw new IllegalStateException(
+            throw new ArticleStateException(
                 "A published article must have an excerpt"
             );
         }
@@ -93,7 +95,7 @@ public class Article {
 
     public void changeBody(String body) {
         if (this.status == ArticleStatus.PUBLISHED && valueIsNullOrBlank(body)) {
-            throw new IllegalStateException(
+            throw new ArticleStateException(
                 "A published article must have a body"
             );
         }
@@ -113,11 +115,11 @@ public class Article {
     public void publish() {
 
         if (this.status == ArticleStatus.PUBLISHED) {
-            throw new IllegalStateException("Only draft or withdrawn articles can be published");
+            throw new ArticleStateException("Only draft or withdrawn articles can be published");
         }
 
         if (!isReadyToPublish()) {
-            throw new IllegalStateException("Article is not ready to be published");
+            throw new ArticleStateException("Article is not ready to be published");
         }
 
         this.status = ArticleStatus.PUBLISHED;
@@ -125,7 +127,7 @@ public class Article {
 
     public void withdraw() {
         if (this.status != ArticleStatus.PUBLISHED) {
-            throw new IllegalStateException("Only published articles can be withdrawn");
+            throw new ArticleStateException("Only published articles can be withdrawn");
         }
         this.status = ArticleStatus.WITHDRAWN;
     }
