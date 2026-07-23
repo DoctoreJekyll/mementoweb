@@ -28,14 +28,21 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Article> getArticleById(Long id) {
-        Optional<Article> article = articleRepository.findById(id);
+    public Article getArticleById(Long id) {
+        Optional<Article> article =
+            articleRepository.findById(id);
+
         if (article.isEmpty()) {
-            throw new ArticleNotFoundException("Article not found", id);
+            throw new ArticleNotFoundException(
+                "Article not found",
+                id
+            );
         }
-        return article;
+
+        return article.get();
     }
 
+    @Transactional
     public Article updateArticle(Long id, String title, String pretitle, String excerpt, String body) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not found", id));
@@ -45,7 +52,7 @@ public class ArticleService {
         article.changeExcerpt(excerpt);
         article.changeBody(body);
 
-        return articleRepository.save(article);
+        return article;
     }
 
     public void deleteArticle(Long id) {
