@@ -34,7 +34,7 @@ public class ApiExceptionHandler {
             exception.getMessage()
         );
 
-        problem.setTitle("Article article state");
+        problem.setTitle("Invalid article state");
 
         return problem;
     }

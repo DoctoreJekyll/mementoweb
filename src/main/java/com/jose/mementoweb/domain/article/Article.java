@@ -1,5 +1,8 @@
 package com.jose.mementoweb.domain.article;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 import com.jose.mementoweb.exception.ArticleStateException;
 
 import jakarta.persistence.Column;
@@ -32,6 +35,10 @@ public class Article {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     private ArticleStatus status;
+
+    private String slug;
+
+    private OffsetDateTime publishedAt;
 
     protected Article() {
         // JPA requires a default constructor
@@ -66,6 +73,16 @@ public class Article {
 
     public String getBody() {
         return body;
+    }
+
+    public String getSlug()
+    {
+        return slug;
+    }
+    
+    public OffsetDateTime getpublishedAt()
+    {
+        return publishedAt;
     }
 
     private void validateTitle(String title) {
@@ -139,6 +156,7 @@ public class Article {
         }
 
         this.status = ArticleStatus.PUBLISHED;
+        setPublishAt();
     }
 
     public void withdraw() {
@@ -146,6 +164,25 @@ public class Article {
             throw new ArticleStateException("Only published articles can be withdrawn");
         }
         this.status = ArticleStatus.WITHDRAWN;
+    }
+
+    private void setPublishAt()
+    {
+        if (publishedAt == null) {
+            publishedAt = OffsetDateTime.now(ZoneOffset.UTC);
+        }
+
+        getpublishedAt();
+    }
+
+    public void assignSlug(String slug)
+    {
+        if (!valueIsNullOrBlank(slug) && this.slug != null) {
+            this.slug = slug;
+        }
+        else{
+            throw new IllegalArgumentException("Article already has a slug");
+        }
     }
 
 

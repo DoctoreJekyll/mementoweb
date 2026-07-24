@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import jakarta.persistence.EntityManager;
 
 import com.jose.mementoweb.domain.article.Article;
+import com.jose.mementoweb.domain.article.ArticleStatus;
 import com.jose.mementoweb.repository.ArticleRepository;
 
 
@@ -37,6 +38,97 @@ class ArticleControllerIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
+    @Test
+    void shouldPublishArticleThroughApi() throws Exception {
+        Article article = new Article("Artículo publicable");
+        article.changeExcerpt("Entradilla");
+        article.changeBody("Contenido");
+
+        Article savedArticle =
+            articleRepository.saveAndFlush(article);
+
+        Long articleId = savedArticle.getId();
+
+        mockMvc.perform(post(
+                    "/api/admin/articles/{id}/publish",
+                    articleId
+                ))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(articleId))
+            .andExpect(jsonPath("$.status")
+                .value("PUBLISHED"))
+            .andExpect(jsonPath("$.canBePublished")
+                .value(false));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Article persistedArticle =
+            articleRepository.findById(articleId)
+                .orElseThrow();
+
+        assertThat(persistedArticle.getStatus())
+            .isEqualTo(ArticleStatus.PUBLISHED);
+    }
+
+    @Test
+    void shouldWithdrawArticleThroughApi() throws Exception {
+        Article article = new Article("Artículo publicado");
+        article.changeExcerpt("Entradilla");
+        article.changeBody("Contenido");
+        article.publish();
+
+        Article savedArticle =
+            articleRepository.saveAndFlush(article);
+
+        Long articleId = savedArticle.getId();
+
+        mockMvc.perform(post(
+                    "/api/admin/articles/{id}/withdraw",
+                    articleId
+                ))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(articleId))
+            .andExpect(jsonPath("$.status")
+                .value("WITHDRAWN"))
+            .andExpect(jsonPath("$.canBePublished")
+                .value(true));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Article persistedArticle =
+            articleRepository.findById(articleId)
+                .orElseThrow();
+
+        assertThat(persistedArticle.getStatus())
+            .isEqualTo(ArticleStatus.WITHDRAWN);
+    }
+
+
+    @Test
+    void shouldReturnConflictWhenPublishingIncompleteArticle()
+            throws Exception {
+
+        Article article = new Article("Artículo incompleto");
+
+        Article savedArticle =
+            articleRepository.saveAndFlush(article);
+
+        mockMvc.perform(post(
+                    "/api/admin/articles/{id}/publish",
+                    savedArticle.getId()
+                ))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.title")
+                .value("Invalid article state"))
+            .andExpect(jsonPath("$.status")
+                .value(409))
+            .andExpect(jsonPath("$.detail")
+                .value(
+                    "Article is not ready to be published"
+                ));
+    }
 
     @Test
     void shouldCreateDraftArticle() throws Exception {
