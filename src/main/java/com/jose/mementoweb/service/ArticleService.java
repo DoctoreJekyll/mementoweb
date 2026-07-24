@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final SlugGenerator slugGenerator;
 
-    public ArticleService(ArticleRepository articleRepository) {
+    public ArticleService(ArticleRepository articleRepository, SlugGenerator slugGenerator) {
         this.articleRepository = articleRepository;
+        this.slugGenerator = slugGenerator;
     }
 
 
@@ -58,7 +60,18 @@ public class ArticleService {
     @Transactional
     public Article publishArticle(Long id) {
         Article article = findArticleOrThrow(id);
-        article.publish();
+
+        String publicationSlug = article.getSlug();
+
+        if (publicationSlug == null) {
+            publicationSlug = slugGenerator.generate(
+                article.getTitle(),
+                article.getId()
+            );
+        }
+
+        article.publish(publicationSlug);
+
         return article;
     }
 

@@ -76,7 +76,7 @@ class ArticleControllerIntegrationTest {
         Article article = new Article("Artículo publicado");
         article.changeExcerpt("Entradilla");
         article.changeBody("Contenido");
-        article.publish();
+        article.publish(article.getSlug());
 
         Article savedArticle =
             articleRepository.saveAndFlush(article);

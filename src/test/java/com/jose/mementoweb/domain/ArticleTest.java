@@ -15,7 +15,7 @@ class ArticleTest {
     void shouldPublishCompleteDraft() {
         Article article = createCompleteDraft();
 
-        article.publish();
+        article.publish("mi-articulo-test-1");
 
         assertThat(article.getStatus())
             .isEqualTo(ArticleStatus.PUBLISHED);
@@ -30,7 +30,7 @@ class ArticleTest {
 
         ArticleStateException exception = assertThrows(
             ArticleStateException.class,
-            () -> article.publish()
+            () -> article.publish("mi-articulo-test-1")
         );
 
         assertThat(exception.getMessage())
@@ -43,7 +43,7 @@ class ArticleTest {
     @Test
     void shouldWithdrawPublishedArticle() {
         Article article = createCompleteDraft();
-        article.publish();
+        article.publish("mi-articulo-test-1");
 
         article.withdraw();
 
@@ -57,10 +57,10 @@ class ArticleTest {
     @Test
     void shouldRepublishWithdrawnArticle() {
         Article article = createCompleteDraft();
-        article.publish();
+        article.publish("mi-articulo-test-1");
         article.withdraw();
 
-        article.publish();
+        article.publish("mi-articulo-test-1");
 
         assertThat(article.getStatus())
             .isEqualTo(ArticleStatus.PUBLISHED);

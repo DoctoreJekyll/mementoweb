@@ -36,8 +36,13 @@ public class Article {
     @Column(nullable = false, length = 50)
     private ArticleStatus status;
 
+    @Column(length = 300, unique = true)
     private String slug;
 
+    @Column(
+        name = "published_at",
+        columnDefinition = "TIMESTAMP WITH TIME ZONE"
+    )
     private OffsetDateTime publishedAt;
 
     protected Article() {
@@ -80,7 +85,7 @@ public class Article {
         return slug;
     }
     
-    public OffsetDateTime getpublishedAt()
+    public OffsetDateTime getPublishedAt()
     {
         return publishedAt;
     }
@@ -140,7 +145,7 @@ public class Article {
             && hasRequiredContent();
     }
 
-    public void publish() {
+    public void publish(String generatedSlug) {
         if (this.status != ArticleStatus.DRAFT
                 && this.status != ArticleStatus.WITHDRAWN) {
 
@@ -155,10 +160,16 @@ public class Article {
             );
         }
 
+        if (this.slug == null) {
+            assignSlug(generatedSlug);
+        }
+
+        setPublishedAtIfAbsent();
+
         this.status = ArticleStatus.PUBLISHED;
-        setPublishAt();
     }
 
+    
     public void withdraw() {
         if (this.status != ArticleStatus.PUBLISHED) {
             throw new ArticleStateException("Only published articles can be withdrawn");
@@ -166,23 +177,28 @@ public class Article {
         this.status = ArticleStatus.WITHDRAWN;
     }
 
-    private void setPublishAt()
-    {
-        if (publishedAt == null) {
-            publishedAt = OffsetDateTime.now(ZoneOffset.UTC);
-        }
 
-        getpublishedAt();
+    private void setPublishedAtIfAbsent() {
+        if (this.publishedAt == null) {
+            this.publishedAt =
+                OffsetDateTime.now(ZoneOffset.UTC);
+        }
     }
 
-    public void assignSlug(String slug)
-    {
-        if (!valueIsNullOrBlank(slug) && this.slug != null) {
-            this.slug = slug;
+    private void assignSlug(String slug) {
+        if (valueIsNullOrBlank(slug)) {
+            throw new IllegalArgumentException(
+                "Slug cannot be null or blank"
+            );
         }
-        else{
-            throw new IllegalArgumentException("Article already has a slug");
+
+        if (this.slug != null) {
+            throw new ArticleStateException(
+                "Article already has a slug"
+            );
         }
+
+        this.slug = slug;
     }
 
 
