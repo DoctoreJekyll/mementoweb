@@ -108,12 +108,22 @@ public class Article {
         return value == null || value.isBlank();
     }
 
-    public boolean isReadyToPublish() {
-        return !valueIsNullOrBlank(this.title ) && !valueIsNullOrBlank(this.excerpt) && !valueIsNullOrBlank(this.body);
+    private boolean hasRequiredContent() {
+        return !valueIsNullOrBlank(this.title)
+            && !valueIsNullOrBlank(this.excerpt)
+            && !valueIsNullOrBlank(this.body);
+    }
+
+    public boolean canBePublished() {
+        boolean hasPublishableStatus =
+            this.status == ArticleStatus.DRAFT
+            || this.status == ArticleStatus.WITHDRAWN;
+
+        return hasPublishableStatus
+            && hasRequiredContent();
     }
 
     public void publish() {
-
         if (this.status != ArticleStatus.DRAFT
                 && this.status != ArticleStatus.WITHDRAWN) {
 
@@ -122,8 +132,10 @@ public class Article {
             );
         }
 
-        if (!isReadyToPublish()) {
-            throw new ArticleStateException("Article is not ready to be published");
+        if (!hasRequiredContent()) {
+            throw new ArticleStateException(
+                "Article is not ready to be published"
+            );
         }
 
         this.status = ArticleStatus.PUBLISHED;

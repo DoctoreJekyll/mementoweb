@@ -3,7 +3,7 @@ package com.jose.mementoweb.dto;
 import com.jose.mementoweb.domain.article.Article;
 
 
-public record AdminArticleResponse(Long id, String title, String pretitle, String excerpt, String body, String status, boolean readyToPublish) {
+public record AdminArticleResponse(Long id, String title, String pretitle, String excerpt, String body, String status, boolean canBePublished) {
     public static AdminArticleResponse from(Article article) {
         return new AdminArticleResponse(article.getId(), 
         article.getTitle(), 
@@ -11,6 +11,6 @@ public record AdminArticleResponse(Long id, String title, String pretitle, Strin
         article.getExcerpt(), 
         article.getBody(), 
         article.getStatus().name(),
-        article.isReadyToPublish());
+        article.canBePublished());
     }
 }
