@@ -22,6 +22,7 @@ import com.jose.mementoweb.dto.UpdateArticleRequest;
 import com.jose.mementoweb.dto.AdminArticleResponse;
 import com.jose.mementoweb.dto.AdminArticleSummaryResponse;
 import com.jose.mementoweb.service.ArticleService;
+import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -76,10 +77,11 @@ public class ArticleController {
         return ResponseEntity.ok(response);
     }
     
+    @GetMapping
     public ResponseEntity<PageResponse<AdminArticleSummaryResponse>>
     getArticles(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "10") @Min(1) @Max(20) int size,
                     @RequestParam(required = false) ArticleStatus status){
-            PageRequest pageable = PageRequest.of(page, size);
+            Pageable pageable = PageRequest.of(page, size);
             Page<Article> articlePage;
 
             if (status == null) {
