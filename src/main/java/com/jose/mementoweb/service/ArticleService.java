@@ -2,9 +2,12 @@ package com.jose.mementoweb.service;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.jose.mementoweb.domain.article.Article;
+import com.jose.mementoweb.domain.article.ArticleStatus;
 import com.jose.mementoweb.exception.ArticleNotFoundException;
 import com.jose.mementoweb.repository.ArticleRepository;
 
@@ -81,4 +84,25 @@ public class ArticleService {
         article.withdraw();
         return article;
     }
+
+
+    @Transactional(readOnly = true)
+    public Page<Article> getArticles(Pageable pageable) {
+        return articleRepository
+            .findAllByOrderByIdDesc(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Article> getArticlesByStatus(
+            ArticleStatus status,
+            Pageable pageable) {
+
+        return articleRepository
+            .findByStatusOrderByIdDesc(
+                status,
+                pageable
+            );
+    }
+
+
 }
