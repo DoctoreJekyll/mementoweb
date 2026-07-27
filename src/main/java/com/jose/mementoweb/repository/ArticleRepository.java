@@ -15,4 +15,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Optional<Article> findBySlugAndStatus(String slug,ArticleStatus status);
 
+    Page<Article> findAllByOrderByIdDesc(Pageable pageable);
+
+    Page<Article> findByStatusOrderByIdDesc(ArticleStatus status,Pageable pageable);
+
 }
