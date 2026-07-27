@@ -41,7 +41,7 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(PublishedArticleNotFoundException.class)
-    public ProblemDetail handlePublishNotFoundException(
+    public ProblemDetail handlePublishedArticleNotFound(
             PublishedArticleNotFoundException exception) {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(

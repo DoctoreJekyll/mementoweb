@@ -7,8 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jose.mementoweb.domain.article.Article;
+import com.jose.mementoweb.domain.article.ArticleStatus;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
-    public Page<Article> findByStatus(Pageable pageable);
-    public Optional<Article> findPublishedArticleBySlug(String slug);
+    
+    Page<Article> findByStatusOrderByPublishedAtDescIdDesc(ArticleStatus status,Pageable pageable);
+
+    Optional<Article> findBySlugAndStatus(String slug,ArticleStatus status);
+
 }
