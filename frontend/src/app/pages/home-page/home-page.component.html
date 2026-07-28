@@ -1,16 +1,18 @@
 <section class="featured-article">
-  <p class="featured-article__pretitle">Ensayo</p>
+  <p class="featured-article__pretitle">
+    {{ featuredArticle.pretitle }}
+  </p>
 
-  <h1>El título de nuestro primer artículo</h1>
+  <h1>{{ featuredArticle.title }}</h1>
 
   <p class="featured-article__excerpt">
-    Una entradilla provisional para empezar a construir la portada.
+    {{ featuredArticle.excerpt }}
   </p>
 
   <time
     class="featured-article__date"
-    datetime="2026-07-28">
-    28 de julio de 2026
+    [attr.datetime]="featuredArticle.publishedAt">
+    {{ featuredArticle.publishedAt | date:'dd/MM/yyyy' }}
   </time>
 </section>
 
@@ -20,56 +22,28 @@
     <h2>Últimos artículos</h2>
   </header>
 
+
   <div class="article-list">
-    <article class="article-summary">
-      <div class="article-summary__heading">
-        <p class="article-summary__pretitle">Reflexión</p>
-        <h3>El valor de perderse en un videojuego</h3>
-      </div>
+    @for (article of articles; track article.slug) {
+      <article class="article-summary">
+        <div class="article-summary__heading">
+          <p class="article-summary__pretitle">
+            {{ article.pretitle }}
+          </p>
 
-      <p class="article-summary__excerpt">
-        Sobre los mundos que no tienen miedo de dejar al jugador sin respuestas.
-      </p>
+          <h3>{{ article.title }}</h3>
+        </div>
 
-      <time
-        class="article-summary__date"
-        datetime="2026-07-20">
-        20 julio 2026
-      </time>
-    </article>
+        <p class="article-summary__excerpt">
+          {{ article.excerpt }}
+        </p>
 
-    <article class="article-summary">
-      <div class="article-summary__heading">
-        <p class="article-summary__pretitle">Artículo</p>
-        <h3>Cuando una interfaz también forma parte de la historia</h3>
-      </div>
-
-      <p class="article-summary__excerpt">
-        Una reflexión sobre las interfaces que consiguen narrar sin interrumpir.
-      </p>
-
-      <time
-        class="article-summary__date"
-        datetime="2026-07-12">
-        12 julio 2026
-      </time>
-    </article>
-
-    <article class="article-summary">
-      <div class="article-summary__heading">
-        <p class="article-summary__pretitle">Opinión</p>
-        <h3>Conservar un videojuego en la era digital</h3>
-      </div>
-
-      <p class="article-summary__excerpt">
-        Qué perdemos cuando una obra depende para siempre de una tienda o servidor.
-      </p>
-
-      <time
-        class="article-summary__date"
-        datetime="2026-07-04">
-        4 julio 2026
-      </time>
-    </article>
+        <time
+          class="article-summary__date"
+          [attr.datetime]="article.publishedAt">
+          {{ article.publishedAt | date:'dd/MM/yyyy' }}
+        </time>
+      </article>
+    }
   </div>
 </section>
