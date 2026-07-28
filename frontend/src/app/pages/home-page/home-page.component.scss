@@ -125,3 +125,12 @@
     gap: 1rem;
   }
 }
+
+.article-list__empty {
+  margin: 0;
+  padding-block: 3rem;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-muted);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+}

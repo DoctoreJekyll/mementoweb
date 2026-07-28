@@ -1,7 +1,9 @@
 <section class="featured-article">
-  <p class="featured-article__pretitle">
-    {{ featuredArticle.pretitle }}
-  </p>
+  @if (featuredArticle.pretitle) {
+    <p class="featured-article__pretitle">
+      {{ featuredArticle.pretitle }}
+    </p>
+  }
 
   <h1>{{ featuredArticle.title }}</h1>
 
@@ -22,14 +24,15 @@
     <h2>Últimos artículos</h2>
   </header>
 
-
   <div class="article-list">
     @for (article of articles; track article.slug) {
       <article class="article-summary">
         <div class="article-summary__heading">
-          <p class="article-summary__pretitle">
-            {{ article.pretitle }}
-          </p>
+          @if (article.pretitle) {
+            <p class="article-summary__pretitle">
+              {{ article.pretitle }}
+            </p>
+          }
 
           <h3>{{ article.title }}</h3>
         </div>
@@ -44,6 +47,10 @@
           {{ article.publishedAt | date:'dd/MM/yyyy' }}
         </time>
       </article>
+    } @empty {
+      <p class="article-list__empty">
+        Todavía no hay artículos publicados.
+      </p>
     }
   </div>
 </section>
