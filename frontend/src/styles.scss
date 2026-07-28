@@ -1,1 +1,33 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --color-paper: #f3efe6;
+  --color-surface: #fffdf8;
+  --color-ink: #1c1b19;
+  --color-muted: #6d6962;
+  --color-accent: #a4422f;
+  --color-line: #cbc4b8;
+
+  --content-width: 1180px;
+  --reading-width: 720px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
