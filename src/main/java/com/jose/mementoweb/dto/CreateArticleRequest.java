@@ -3,6 +3,7 @@ package com.jose.mementoweb.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+//Crear borrador
 public record CreateArticleRequest(@NotBlank @Size(max = 255) String title) {
 
 }

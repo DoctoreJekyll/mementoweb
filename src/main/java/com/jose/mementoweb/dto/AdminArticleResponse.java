@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.jose.mementoweb.domain.article.Article;
 
-
+//Detalle administrativo
 public record AdminArticleResponse(Long id, String title, String pretitle, String excerpt, String body, String status, boolean canBePublished, String slug, OffsetDateTime publishedAt) {
     public static AdminArticleResponse from(Article article) {
         return new AdminArticleResponse(article.getId(), 

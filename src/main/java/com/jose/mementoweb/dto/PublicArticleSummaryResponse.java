@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.jose.mementoweb.domain.article.Article;
 
+//Portada publica
 public record PublicArticleSummaryResponse(
     String slug,
     String title,

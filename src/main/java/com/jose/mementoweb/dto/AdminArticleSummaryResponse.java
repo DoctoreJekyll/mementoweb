@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 
 import com.jose.mementoweb.domain.article.Article;
 
+//Listado administrativo
 public record AdminArticleSummaryResponse(
     Long id,
     String title,
