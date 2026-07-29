@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { PageResponse } from '../core/page-response';
 import { ArticleSummary } from './article-summary';
+import { ArticleDetail } from './article-detail';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,14 @@ export class ArticleApiService {
                 size
             }
             }
+        );
+    }
+
+    getPublishedArticleBySlug(slug: string): Observable<ArticleDetail> {
+        const encodedSlug = encodeURIComponent(slug);
+
+        return this.http.get<ArticleDetail>(
+            `/api/articles/${encodedSlug}`
         );
     }
 
