@@ -1,1 +1,153 @@
-<p>admin-article-list-page works!</p>
+<section class="admin-page">
+  <header class="admin-page__header">
+    <div>
+      <p class="admin-page__eyebrow">
+        Administración
+      </p>
+
+      <h1>Artículos</h1>
+
+      <p class="admin-page__description">
+        Gestiona los borradores y publicaciones de Memento vivere.
+      </p>
+    </div>
+
+    <a
+      class="admin-page__public-link"
+      routerLink="/">
+      ← Ver web pública
+    </a>
+  </header>
+
+  <nav
+    class="article-filters"
+    aria-label="Filtrar artículos por estado">
+
+    <button
+      type="button"
+      [class.is-active]="selectedStatus() === null"
+      [attr.aria-pressed]="selectedStatus() === null"
+      (click)="filterByStatus(null)">
+      Todos
+    </button>
+
+    <button
+      type="button"
+      [class.is-active]="selectedStatus() === 'DRAFT'"
+      [attr.aria-pressed]="selectedStatus() === 'DRAFT'"
+      (click)="filterByStatus('DRAFT')">
+      Borradores
+    </button>
+
+    <button
+      type="button"
+      [class.is-active]="selectedStatus() === 'PUBLISHED'"
+      [attr.aria-pressed]="selectedStatus() === 'PUBLISHED'"
+      (click)="filterByStatus('PUBLISHED')">
+      Publicados
+    </button>
+
+    <button
+      type="button"
+      [class.is-active]="selectedStatus() === 'WITHDRAWN'"
+      [attr.aria-pressed]="selectedStatus() === 'WITHDRAWN'"
+      (click)="filterByStatus('WITHDRAWN')">
+      Retirados
+    </button>
+  </nav>
+
+  @if (isLoading()) {
+    <div
+      class="admin-state"
+      aria-live="polite">
+      <p>Cargando artículos…</p>
+    </div>
+  } @else if (loadError()) {
+    <div
+      class="admin-state admin-state--error"
+      role="alert">
+
+      <h2>No hemos podido cargar los artículos</h2>
+
+      <p>
+        Comprueba que Spring y PostgreSQL están levantados.
+      </p>
+
+      <button
+        type="button"
+        (click)="reloadArticles()">
+        Volver a intentarlo
+      </button>
+    </div>
+  } @else {
+    <p class="article-results">
+      Artículos encontrados: {{ totalElements() }}
+    </p>
+
+    <div class="admin-article-list">
+      @for (
+        article of articles();
+        track article.id
+      ) {
+        <article class="admin-article">
+          <div class="admin-article__heading">
+            @if (article.pretitle) {
+              <p class="admin-article__pretitle">
+                {{ article.pretitle }}
+              </p>
+            }
+
+            <h2>{{ article.title }}</h2>
+
+            <p class="admin-article__id">
+              ID {{ article.id }}
+            </p>
+          </div>
+
+          <div class="admin-article__state">
+            <span
+              class="article-status"
+              [attr.data-status]="article.status">
+              {{ statusLabels[article.status] }}
+            </span>
+
+            @if (article.status !== 'PUBLISHED') {
+              <span class="publication-readiness">
+                {{
+                  article.canBePublished
+                    ? 'Listo para publicar'
+                    : 'Contenido incompleto'
+                }}
+              </span>
+            }
+          </div>
+
+          <div class="admin-article__publication">
+            @if (article.publishedAt) {
+              <time
+                [attr.datetime]="article.publishedAt">
+                {{
+                  article.publishedAt
+                    | date:'dd/MM/yyyy'
+                }}
+              </time>
+            } @else {
+              <span>Sin publicar</span>
+            }
+
+            @if (article.slug) {
+              <code>{{ article.slug }}</code>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="admin-state">
+          <h2>No hay artículos en este estado</h2>
+          <p>
+            Prueba con otro filtro o crea un artículo nuevo.
+          </p>
+        </div>
+      }
+    </div>
+  }
+</section>
