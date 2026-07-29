@@ -8,10 +8,11 @@ import {
 
 import { ArticleApiService } from '../../articles/article-api.service';
 import { ArticleSummary } from '../../articles/article-summary';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home-page',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })

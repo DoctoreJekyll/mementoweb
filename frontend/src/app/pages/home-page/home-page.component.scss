@@ -172,3 +172,20 @@
 .page-state--error h1 {
   color: var(--color-accent);
 }
+
+.featured-article h1 a,
+.article-summary h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.featured-article h1 a:hover,
+.article-summary h3 a:hover {
+  color: var(--color-accent);
+}
+
+.featured-article h1 a:focus-visible,
+.article-summary h3 a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}

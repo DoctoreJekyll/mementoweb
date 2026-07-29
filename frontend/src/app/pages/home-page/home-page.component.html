@@ -22,7 +22,11 @@
       </p>
     }
 
-    <h1>{{ featured.title }}</h1>
+    <h1>
+      <a [routerLink]="['/articulos', featured.slug]">
+        {{ featured.title }}
+      </a>
+    </h1>
 
     <p class="featured-article__excerpt">
       {{ featured.excerpt }}
@@ -51,7 +55,11 @@
               </p>
             }
 
-            <h3>{{ article.title }}</h3>
+            <h1>
+              <a [routerLink]="['/articulos', featured.slug]">
+                {{ featured.title }}
+              </a>
+            </h1>
           </div>
 
           <p class="article-summary__excerpt">
