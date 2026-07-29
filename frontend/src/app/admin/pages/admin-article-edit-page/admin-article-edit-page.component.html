@@ -1,1 +1,227 @@
-<p>admin-article-edit-page works!</p>
+@if (isLoading()) {
+  <section
+    class="editor-state"
+    aria-live="polite">
+    <p>Cargando artículo…</p>
+  </section>
+} @else if (notFound()) {
+  <section class="editor-state">
+    <p class="editor-state__label">404</p>
+
+    <h1>Este artículo no existe</h1>
+
+    <p>
+      El identificador no corresponde con ningún artículo.
+    </p>
+
+    <a routerLink="/admin/articulos">
+      Volver a artículos
+    </a>
+  </section>
+} @else if (loadError()) {
+  <section
+    class="editor-state editor-state--error"
+    role="alert">
+
+    <p class="editor-state__label">Error</p>
+
+    <h1>No hemos podido cargar el artículo</h1>
+
+    <p>
+      Comprueba que el servidor está disponible.
+    </p>
+
+    <button
+      type="button"
+      (click)="reloadArticle()">
+      Volver a intentarlo
+    </button>
+  </section>
+} @else if (article(); as currentArticle) {
+  <section class="article-editor">
+    <header class="article-editor__header">
+      <a
+        class="article-editor__back"
+        routerLink="/admin/articulos">
+        ← Volver a artículos
+      </a>
+
+      <div class="article-editor__identity">
+        <div>
+          <p class="article-editor__eyebrow">
+            Administración · ID {{ currentArticle.id }}
+          </p>
+
+          <h1>Editar artículo</h1>
+        </div>
+
+        <span
+          class="article-status"
+          [attr.data-status]="currentArticle.status">
+          {{ statusLabels[currentArticle.status] }}
+        </span>
+      </div>
+
+      @if (currentArticle.status !== 'PUBLISHED') {
+        <p class="publication-readiness">
+          @if (currentArticle.canBePublished) {
+            Este artículo tiene el contenido necesario para publicarse.
+          } @else {
+            Completa título, entradilla y cuerpo antes de publicarlo.
+          }
+        </p>
+      }
+    </header>
+
+    <form
+      class="article-form"
+      [formGroup]="form"
+      (ngSubmit)="saveArticle()"
+      novalidate>
+
+      <div class="form-field">
+        <div class="form-field__heading">
+          <label for="article-title">
+            Título
+          </label>
+
+          <span>
+            {{ titleControl.value.length }}/255
+          </span>
+        </div>
+
+        <input
+          id="article-title"
+          type="text"
+          formControlName="title"
+          maxlength="255"
+          autocomplete="off">
+
+        @if (
+          titleControl.touched
+          && titleControl.invalid
+        ) {
+          <p
+            class="form-field__error"
+            role="alert">
+
+            @if (
+              titleControl.hasError('required')
+              || titleControl.hasError('pattern')
+            ) {
+              El título no puede estar vacío.
+            } @else if (
+              titleControl.hasError('maxlength')
+            ) {
+              El título no puede superar los 255 caracteres.
+            }
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <div class="form-field__heading">
+          <label for="article-pretitle">
+            Antetítulo
+          </label>
+
+          <span>
+            {{ pretitleControl.value.length }}/255
+          </span>
+        </div>
+
+        <input
+          id="article-pretitle"
+          type="text"
+          formControlName="pretitle"
+          maxlength="255"
+          autocomplete="off"
+          placeholder="Ensayo, reflexión, opinión…">
+
+        @if (
+          pretitleControl.touched
+          && pretitleControl.hasError('maxlength')
+        ) {
+          <p
+            class="form-field__error"
+            role="alert">
+            El antetítulo no puede superar los 255 caracteres.
+          </p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="article-excerpt">
+          Entradilla
+        </label>
+
+        <p class="form-field__help">
+          Es el resumen que aparecerá en la portada.
+        </p>
+
+        <textarea
+          id="article-excerpt"
+          formControlName="excerpt"
+          rows="5"
+          placeholder="Una introducción breve al artículo…">
+        </textarea>
+      </div>
+
+      <div class="form-field">
+        <label for="article-body">
+          Cuerpo
+        </label>
+
+        <p class="form-field__help">
+          Por ahora trabajaremos con texto plano y saltos de línea.
+        </p>
+
+        <textarea
+          id="article-body"
+          formControlName="body"
+          rows="18"
+          placeholder="Empieza a escribir el artículo…">
+        </textarea>
+      </div>
+
+      @if (
+        saveSuccess()
+        && form.pristine
+      ) {
+        <p
+          class="save-message save-message--success"
+          role="status">
+          Cambios guardados correctamente.
+        </p>
+      }
+
+      @if (saveError()) {
+        <p
+          class="save-message save-message--error"
+          role="alert">
+          No hemos podido guardar los cambios.
+        </p>
+      }
+
+      <div class="article-form__actions">
+        <a routerLink="/admin/articulos">
+          Volver sin guardar
+        </a>
+
+        <button
+          type="submit"
+          [disabled]="
+            isSaving()
+            || form.pristine
+          ">
+
+          @if (isSaving()) {
+            Guardando…
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+}

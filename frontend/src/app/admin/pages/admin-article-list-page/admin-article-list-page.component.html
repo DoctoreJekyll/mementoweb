@@ -105,7 +105,16 @@
               </p>
             }
 
-            <h2>{{ article.title }}</h2>
+            <h2>
+              <a
+                [routerLink]="[
+                  '/admin/articulos',
+                  article.id,
+                  'editar'
+                ]">
+                {{ article.title }}
+              </a>
+            </h2>
 
             <p class="admin-article__id">
               ID {{ article.id }}

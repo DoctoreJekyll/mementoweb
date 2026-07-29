@@ -1,0 +1,227 @@
+:host {
+  display: block;
+  width: min(
+    calc(100% - 2rem),
+    var(--content-width)
+  );
+  margin-inline: auto;
+}
+
+.article-editor,
+.editor-state {
+  padding-block: clamp(3rem, 7vw, 6rem);
+}
+
+.article-editor__header {
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--color-ink);
+}
+
+.article-editor__back {
+  display: inline-block;
+  margin-bottom: 3rem;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.article-editor__back:hover {
+  color: var(--color-accent);
+}
+
+.article-editor__identity {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.article-editor__eyebrow,
+.editor-state__label {
+  margin-bottom: 0.75rem;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.article-editor h1,
+.editor-state h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.75rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.article-status {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-line);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.article-status[data-status='PUBLISHED'] {
+  border-color: #63775b;
+  color: #3f5938;
+}
+
+.article-status[data-status='DRAFT'] {
+  border-color: #9a7a43;
+  color: #795d2e;
+}
+
+.article-status[data-status='WITHDRAWN'] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.publication-readiness {
+  max-width: var(--reading-width);
+  margin: 1.5rem 0 0;
+  color: var(--color-muted);
+}
+
+.article-form {
+  max-width: var(--reading-width);
+  padding-block: 3rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.form-field__heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.form-field label {
+  font-weight: 700;
+}
+
+.form-field__heading span,
+.form-field__help {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.form-field__help {
+  margin: -0.25rem 0 0;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 0;
+  outline: none;
+
+  background: rgba(255, 253, 248, 0.45);
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.form-field input {
+  padding: 1rem 0;
+  border-width: 0 0 1px;
+  background: transparent;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+.form-field textarea {
+  padding: 1rem;
+  line-height: 1.65;
+  resize: vertical;
+}
+
+.form-field textarea[formControlName='body'] {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.form-field__error,
+.save-message--error {
+  color: var(--color-accent);
+  font-size: 0.8125rem;
+}
+
+.save-message {
+  padding: 1rem;
+  border: 1px solid var(--color-line);
+}
+
+.save-message--success {
+  border-color: #63775b;
+  color: #3f5938;
+}
+
+.article-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+}
+
+.article-form__actions a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.article-form__actions button,
+.editor-state button {
+  padding: 0.85rem 1.25rem;
+  border: 1px solid var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font: inherit;
+  cursor: pointer;
+}
+
+.article-form__actions button:hover:not(:disabled),
+.editor-state button:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.article-form__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.editor-state {
+  max-width: var(--reading-width);
+}
+
+.editor-state p {
+  color: var(--color-muted);
+}
+
+.editor-state a {
+  color: var(--color-ink);
+}
+
+.editor-state--error {
+  color: var(--color-accent);
+}
+
+@media (max-width: 640px) {
+  .article-editor__identity,
+  .article-form__actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
