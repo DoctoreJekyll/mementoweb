@@ -49,6 +49,15 @@ export class AdminArticleEditPage implements OnInit {
   protected readonly saveError = signal(false);
   protected readonly saveSuccess = signal(false);
 
+  protected readonly statusAction =
+    signal<'PUBLISH' | 'WITHDRAW' | null>(null);
+
+  protected readonly statusChangeError =
+    signal(false);
+
+  protected readonly statusChangeMessage =
+    signal<string | null>(null);
+
   protected readonly statusLabels:
     Record<ArticleStatus, string> = {
       DRAFT: 'Borrador',
@@ -129,37 +138,36 @@ export class AdminArticleEditPage implements OnInit {
     this.articleId = parsedId;
     this.loadArticle();
   }
-  
+
   private loadArticle(): void {
-  if (this.articleId === null) {
-    return;
-  }
+    if (this.articleId === null) {
+      return;
+    }
 
-  this.isLoading.set(true);
-  this.notFound.set(false);
-  this.loadError.set(false);
+    this.isLoading.set(true);
+    this.notFound.set(false);
+    this.loadError.set(false);
 
-  this.adminArticleApiService
-    .getArticleById(this.articleId)
-    .subscribe({
-      next: article => {
-        this.article.set(article);
+    this.adminArticleApiService
+      .getArticleById(this.articleId)
+      .subscribe({
+        next: article => {
+          this.article.set(article);
+          this.fillForm(article);
 
-        this.fillForm(article);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          if (error.status === 404) {
+            this.notFound.set(true);
+          } else {
+            this.loadError.set(true);
+          }
 
-        this.isLoading.set(false);
-      },
-      error: error => {
-        if (error.status === 404) {
-          this.notFound.set(true);
-        } else {
-          this.loadError.set(true);
+          this.isLoading.set(false);
         }
-
-        this.isLoading.set(false);
-      }
-    });
-}
+      });
+  }
 
   private fillForm(
     article: AdminArticleDetail
@@ -175,75 +183,175 @@ export class AdminArticleEditPage implements OnInit {
   }
 
   protected saveArticle(): void {
-  if (this.form.invalid) {
-    this.form.markAllAsTouched();
-    return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    if (
+      this.articleId === null
+      || this.isSaving()
+    ) {
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.saveError.set(false);
+    this.saveSuccess.set(false);
+
+    this.statusChangeError.set(false);
+    this.statusChangeMessage.set(null);
+
+    const request: UpdateArticleRequest = {
+      title: this.titleControl.value.trim(),
+
+      pretitle: this.normalizeOptionalText(
+        this.pretitleControl.value
+      ),
+
+      excerpt: this.normalizeOptionalText(
+        this.excerptControl.value
+      ),
+
+      body: this.normalizeOptionalText(
+        this.bodyControl.value
+      )
+    };
+
+    this.adminArticleApiService
+      .updateArticle(
+        this.articleId,
+        request
+      )
+      .subscribe({
+        next: updatedArticle => {
+          this.article.set(updatedArticle);
+          this.fillForm(updatedArticle);
+
+          this.isSaving.set(false);
+          this.saveSuccess.set(true);
+        },
+        error: error => {
+          console.error(
+            'Could not update article',
+            error
+          );
+
+          this.isSaving.set(false);
+          this.saveError.set(true);
+        }
+      });
   }
 
-  if (
-    this.articleId === null
-    || this.isSaving()
-  ) {
-    return;
+  protected publishArticle(): void {
+    const currentArticle = this.article();
+
+    if (
+      this.articleId === null
+      || currentArticle === null
+      || this.form.dirty
+      || this.isSaving()
+      || this.statusAction() !== null
+    ) {
+      return;
+    }
+
+    if (
+      currentArticle.status !== 'DRAFT'
+      && currentArticle.status !== 'WITHDRAWN'
+    ) {
+      return;
+    }
+
+    if (!currentArticle.canBePublished) {
+      return;
+    }
+
+    this.statusAction.set('PUBLISH');
+    this.statusChangeError.set(false);
+    this.statusChangeMessage.set(null);
+    this.saveSuccess.set(false);
+
+    this.adminArticleApiService
+      .publishArticle(this.articleId)
+      .subscribe({
+        next: publishedArticle => {
+          this.article.set(publishedArticle);
+          this.fillForm(publishedArticle);
+
+          this.statusAction.set(null);
+
+          this.statusChangeMessage.set(
+            'Artículo publicado correctamente.'
+          );
+        },
+        error: error => {
+          console.error(
+            'Could not publish article',
+            error
+          );
+
+          this.statusAction.set(null);
+          this.statusChangeError.set(true);
+        }
+      });
   }
 
-  this.isSaving.set(true);
-  this.saveError.set(false);
-  this.saveSuccess.set(false);
+  protected withdrawArticle(): void {
+    const currentArticle = this.article();
 
-  const request: UpdateArticleRequest = {
-    title: this.titleControl.value.trim(),
+    if (
+      this.articleId === null
+      || currentArticle === null
+      || currentArticle.status !== 'PUBLISHED'
+      || this.form.dirty
+      || this.isSaving()
+      || this.statusAction() !== null
+    ) {
+      return;
+    }
 
-    pretitle: this.normalizeOptionalText(
-      this.pretitleControl.value
-    ),
+    this.statusAction.set('WITHDRAW');
+    this.statusChangeError.set(false);
+    this.statusChangeMessage.set(null);
+    this.saveSuccess.set(false);
 
-    excerpt: this.normalizeOptionalText(
-      this.excerptControl.value
-    ),
+    this.adminArticleApiService
+      .withdrawArticle(this.articleId)
+      .subscribe({
+        next: withdrawnArticle => {
+          this.article.set(withdrawnArticle);
+          this.fillForm(withdrawnArticle);
 
-    body: this.normalizeOptionalText(
-      this.bodyControl.value
-    )
-  };
+          this.statusAction.set(null);
 
-  this.adminArticleApiService
-    .updateArticle(
-      this.articleId,
-      request
-    )
-    .subscribe({
-      next: updatedArticle => {
-        this.article.set(updatedArticle);
-        this.fillForm(updatedArticle);
+          this.statusChangeMessage.set(
+            'Artículo retirado correctamente.'
+          );
+        },
+        error: error => {
+          console.error(
+            'Could not withdraw article',
+            error
+          );
 
-        this.isSaving.set(false);
-        this.saveSuccess.set(true);
-      },
-      error: error => {
-        console.error(
-          'Could not update article',
-          error
-        );
+          this.statusAction.set(null);
+          this.statusChangeError.set(true);
+        }
+      });
+  }
 
-        this.isSaving.set(false);
-        this.saveError.set(true);
-      }
-    });
-}
+  protected reloadArticle(): void {
+    this.loadArticle();
+  }
 
-protected reloadArticle(): void {
-  this.loadArticle();
-}
+  private normalizeOptionalText(
+    value: string
+  ): string | null {
+    const normalizedValue = value.trim();
 
-private normalizeOptionalText(
-  value: string
-): string | null {
-  const normalizedValue = value.trim();
-
-  return normalizedValue.length === 0
-    ? null
-    : normalizedValue;
-}
-
+    return normalizedValue.length === 0
+      ? null
+      : normalizedValue;
+  }
 }

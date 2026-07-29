@@ -28,8 +28,16 @@ describe('AdminArticleEditPage', () => {
   let updateArticleResponse:
     Observable<AdminArticleDetail>;
 
+  let publishArticleResponse:
+    Observable<AdminArticleDetail>;
+
+  let withdrawArticleResponse:
+    Observable<AdminArticleDetail>;
+
   let requestedArticleId: number | undefined;
   let updatedArticleId: number | undefined;
+  let publishedArticleId: number | undefined;
+  let withdrawnArticleId: number | undefined;
 
   let receivedUpdateRequest:
     UpdateArticleRequest | undefined;
@@ -51,6 +59,20 @@ describe('AdminArticleEditPage', () => {
     body: 'Cuerpo actualizado.'
   };
 
+  const publishedArticle: AdminArticleDetail = {
+    ...originalArticle,
+    status: 'PUBLISHED',
+    canBePublished: false,
+    slug: 'un-nuevo-articulo-110',
+    publishedAt: '2026-07-29T16:00:00Z'
+  };
+
+  const withdrawnArticle: AdminArticleDetail = {
+    ...publishedArticle,
+    status: 'WITHDRAWN',
+    canBePublished: true
+  };
+
   const adminArticleApiServiceStub = {
     getArticleById(id: number) {
       requestedArticleId = id;
@@ -66,16 +88,32 @@ describe('AdminArticleEditPage', () => {
       receivedUpdateRequest = request;
 
       return updateArticleResponse;
+    },
+
+    publishArticle(id: number) {
+      publishedArticleId = id;
+
+      return publishArticleResponse;
+    },
+
+    withdrawArticle(id: number) {
+      withdrawnArticleId = id;
+
+      return withdrawArticleResponse;
     }
   };
 
   beforeEach(async () => {
     requestedArticleId = undefined;
     updatedArticleId = undefined;
+    publishedArticleId = undefined;
+    withdrawnArticleId = undefined;
     receivedUpdateRequest = undefined;
 
     getArticleResponse = of(originalArticle);
     updateArticleResponse = of(updatedArticle);
+    publishArticleResponse = of(publishedArticle);
+    withdrawArticleResponse = of(withdrawnArticle);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -109,13 +147,16 @@ describe('AdminArticleEditPage', () => {
     fixture.detectChanges();
   }
 
+  function getCompiled(): HTMLElement {
+    return fixture.nativeElement as HTMLElement;
+  }
+
   it('should load and render the article', () => {
     createComponent();
 
     expect(requestedArticleId).toBe(110);
 
-    const compiled =
-      fixture.nativeElement as HTMLElement;
+    const compiled = getCompiled();
 
     const titleInput =
       compiled.querySelector<HTMLInputElement>(
@@ -156,8 +197,7 @@ describe('AdminArticleEditPage', () => {
   it('should update the article when the form is submitted', () => {
     createComponent();
 
-    const compiled =
-      fixture.nativeElement as HTMLElement;
+    const compiled = getCompiled();
 
     const bodyTextarea =
       compiled.querySelector<HTMLTextAreaElement>(
@@ -217,6 +257,132 @@ describe('AdminArticleEditPage', () => {
       );
   });
 
+  it('should publish a complete saved article', () => {
+    createComponent();
+
+    const compiled = getCompiled();
+
+    const publishButton =
+      compiled.querySelector<HTMLButtonElement>(
+        '.editorial-action--publish'
+      );
+
+    expect(publishButton).toBeTruthy();
+    expect(publishButton?.disabled).toBe(false);
+
+    publishButton?.click();
+    fixture.detectChanges();
+
+    expect(publishedArticleId).toBe(110);
+
+    expect(compiled.textContent)
+      .toContain(
+        'Artículo publicado correctamente'
+      );
+
+    expect(
+      compiled.querySelector(
+        '.article-status'
+      )?.textContent
+    ).toContain('Publicado');
+
+    expect(
+      compiled.querySelector(
+        '.editorial-action--view'
+      )
+    ).toBeTruthy();
+
+    expect(
+      compiled.querySelector(
+        '.editorial-action--withdraw'
+      )
+    ).toBeTruthy();
+  });
+
+  it('should prevent publication when there are unsaved changes', () => {
+    createComponent();
+
+    const compiled = getCompiled();
+
+    const titleInput =
+      compiled.querySelector<HTMLInputElement>(
+        '#article-title'
+      );
+
+    expect(titleInput).toBeTruthy();
+
+    if (!titleInput) {
+      return;
+    }
+
+    titleInput.value =
+      'Título modificado sin guardar';
+
+    titleInput.dispatchEvent(
+      new Event('input')
+    );
+
+    fixture.detectChanges();
+
+    const publishButton =
+      compiled.querySelector<HTMLButtonElement>(
+        '.editorial-action--publish'
+      );
+
+    expect(publishButton).toBeTruthy();
+    expect(publishButton?.disabled).toBe(true);
+
+    publishButton?.click();
+
+    expect(publishedArticleId)
+      .toBeUndefined();
+
+    expect(compiled.textContent)
+      .toContain(
+        'Guarda los cambios antes de modificar'
+      );
+  });
+
+  it('should withdraw a published article', () => {
+    getArticleResponse = of(publishedArticle);
+
+    createComponent();
+
+    const compiled = getCompiled();
+
+    const withdrawButton =
+      compiled.querySelector<HTMLButtonElement>(
+        '.editorial-action--withdraw'
+      );
+
+    expect(withdrawButton).toBeTruthy();
+    expect(withdrawButton?.disabled).toBe(false);
+
+    withdrawButton?.click();
+    fixture.detectChanges();
+
+    expect(withdrawnArticleId).toBe(110);
+
+    expect(compiled.textContent)
+      .toContain(
+        'Artículo retirado correctamente'
+      );
+
+    expect(
+      compiled.querySelector(
+        '.article-status'
+      )?.textContent
+    ).toContain('Retirado');
+
+    const publishButton =
+      compiled.querySelector<HTMLButtonElement>(
+        '.editorial-action--publish'
+      );
+
+    expect(publishButton?.textContent)
+      .toContain('Volver a publicar');
+  });
+
   it('should show a not found state when the article does not exist', () => {
     getArticleResponse = throwError(() => ({
       status: 404
@@ -224,8 +390,7 @@ describe('AdminArticleEditPage', () => {
 
     createComponent();
 
-    const compiled =
-      fixture.nativeElement as HTMLElement;
+    const compiled = getCompiled();
 
     expect(compiled.textContent)
       .toContain(

@@ -6,7 +6,9 @@
   </section>
 } @else if (notFound()) {
   <section class="editor-state">
-    <p class="editor-state__label">404</p>
+    <p class="editor-state__label">
+      404
+    </p>
 
     <h1>Este artículo no existe</h1>
 
@@ -23,7 +25,9 @@
     class="editor-state editor-state--error"
     role="alert">
 
-    <p class="editor-state__label">Error</p>
+    <p class="editor-state__label">
+      Error
+    </p>
 
     <h1>No hemos podido cargar el artículo</h1>
 
@@ -72,6 +76,113 @@
         </p>
       }
     </header>
+
+    <section
+      class="editorial-actions"
+      aria-labelledby="editorial-actions-title">
+
+      <div class="editorial-actions__content">
+        <div>
+          <p class="editorial-actions__eyebrow">
+            Publicación
+          </p>
+
+          <h2 id="editorial-actions-title">
+            Estado editorial
+          </h2>
+
+          @if (form.dirty) {
+            <p class="editorial-actions__warning">
+              Guarda los cambios antes de modificar
+              el estado del artículo.
+            </p>
+          } @else if (
+            currentArticle.status !== 'PUBLISHED'
+            && !currentArticle.canBePublished
+          ) {
+            <p class="editorial-actions__description">
+              El artículo necesita título, entradilla
+              y cuerpo para poder publicarse.
+            </p>
+          }
+        </div>
+
+        <div class="editorial-actions__buttons">
+          @if (
+            currentArticle.status === 'DRAFT'
+            || currentArticle.status === 'WITHDRAWN'
+          ) {
+            <button
+              type="button"
+              class="editorial-action editorial-action--publish"
+              [disabled]="
+                !currentArticle.canBePublished
+                || form.dirty
+                || isSaving()
+                || statusAction() !== null
+              "
+              (click)="publishArticle()">
+
+              @if (statusAction() === 'PUBLISH') {
+                Publicando…
+              } @else if (
+                currentArticle.status === 'WITHDRAWN'
+              ) {
+                Volver a publicar
+              } @else {
+                Publicar artículo
+              }
+            </button>
+          }
+
+          @if (currentArticle.status === 'PUBLISHED') {
+            @if (currentArticle.slug) {
+              <a
+                class="editorial-action editorial-action--view"
+                [routerLink]="[
+                  '/articulos',
+                  currentArticle.slug
+                ]">
+                Ver publicado
+              </a>
+            }
+
+            <button
+              type="button"
+              class="editorial-action editorial-action--withdraw"
+              [disabled]="
+                form.dirty
+                || isSaving()
+                || statusAction() !== null
+              "
+              (click)="withdrawArticle()">
+
+              @if (statusAction() === 'WITHDRAW') {
+                Retirando…
+              } @else {
+                Retirar artículo
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (statusChangeMessage(); as message) {
+        <p
+          class="status-change-message status-change-message--success"
+          role="status">
+          {{ message }}
+        </p>
+      }
+
+      @if (statusChangeError()) {
+        <p
+          class="status-change-message status-change-message--error"
+          role="alert">
+          No hemos podido cambiar el estado del artículo.
+        </p>
+      }
+    </section>
 
     <form
       class="article-form"
