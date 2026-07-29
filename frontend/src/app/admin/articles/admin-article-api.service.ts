@@ -53,6 +53,25 @@ export class AdminArticleApiService {
       return this.http.put<AdminArticleDetail>(
         `${this.baseUrl}/${id}`,
          request
-  );
-}
+      );
+    }
+
+    publishArticle(
+      id: number
+    ): Observable<AdminArticleDetail> {
+      return this.http.post<AdminArticleDetail>(
+        `${this.baseUrl}/${id}/publish`,
+        null
+      );
+    }
+
+    withdrawArticle(
+      id: number
+    ): Observable<AdminArticleDetail> {
+      return this.http.post<AdminArticleDetail>(
+        `${this.baseUrl}/${id}/withdraw`,
+        null
+      );
+    }
+    
 }

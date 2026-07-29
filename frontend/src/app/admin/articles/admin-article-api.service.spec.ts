@@ -14,6 +14,82 @@ describe('AdminArticleApiService', () => {
   let service: AdminArticleApiService;
   let httpTesting: HttpTestingController;
 
+  it('should withdraw a published article', () => {
+  const articleId = 110;
+
+  const expectedArticle: AdminArticleDetail = {
+    id: articleId,
+    title: 'Un artículo completo',
+    pretitle: 'Ensayo',
+    excerpt: 'Entradilla completa.',
+    body: 'Cuerpo completo.',
+    status: 'WITHDRAWN',
+    canBePublished: true,
+    slug: 'un-articulo-completo-110',
+    publishedAt: '2026-07-29T16:00:00Z'
+  };
+
+  let receivedArticle:
+    AdminArticleDetail | undefined;
+
+  service
+    .withdrawArticle(articleId)
+    .subscribe(article => {
+      receivedArticle = article;
+    });
+
+  const request = httpTesting.expectOne(
+    `/api/admin/articles/${articleId}/withdraw`
+  );
+
+  expect(request.request.method).toBe('POST');
+  expect(request.request.body).toBeNull();
+
+  request.flush(expectedArticle);
+
+  expect(receivedArticle).toEqual(
+    expectedArticle
+  );
+});
+
+  it('should publish an article', () => {
+  const articleId = 110;
+
+  const expectedArticle: AdminArticleDetail = {
+    id: articleId,
+    title: 'Un artículo completo',
+    pretitle: 'Ensayo',
+    excerpt: 'Entradilla completa.',
+    body: 'Cuerpo completo.',
+    status: 'PUBLISHED',
+    canBePublished: false,
+    slug: 'un-articulo-completo-110',
+    publishedAt: '2026-07-29T16:00:00Z'
+  };
+
+  let receivedArticle:
+    AdminArticleDetail | undefined;
+
+  service
+    .publishArticle(articleId)
+    .subscribe(article => {
+      receivedArticle = article;
+    });
+
+  const request = httpTesting.expectOne(
+    `/api/admin/articles/${articleId}/publish`
+  );
+
+  expect(request.request.method).toBe('POST');
+  expect(request.request.body).toBeNull();
+
+  request.flush(expectedArticle);
+
+  expect(receivedArticle).toEqual(
+    expectedArticle
+  );
+});
+
   it('should update an admin article', () => {
   const articleId = 110;
 
