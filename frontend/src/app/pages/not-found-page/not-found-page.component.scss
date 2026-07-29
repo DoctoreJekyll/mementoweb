@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.not-found {
+  display: flex;
+  width: min(
+    calc(100% - 2rem),
+    var(--reading-width)
+  );
+  min-height: 60vh;
+  margin-inline: auto;
+  padding-block: clamp(4rem, 10vw, 8rem);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.not-found__label {
+  margin-bottom: 1rem;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.not-found h1 {
+  margin-bottom: 1.5rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.not-found__description {
+  max-width: 600px;
+  margin-bottom: 2rem;
+  color: var(--color-muted);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.not-found a {
+  width: fit-content;
+  color: var(--color-ink);
+  font-weight: 700;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 0.25rem;
+}
+
+.not-found a:hover {
+  color: var(--color-accent);
+}
+
+.not-found a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
