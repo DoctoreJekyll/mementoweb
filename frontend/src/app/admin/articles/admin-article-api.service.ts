@@ -6,6 +6,7 @@ import { PageResponse } from '../../core/page-response';
 import { AdminArticleDetail } from './admin-article-detail';
 import { AdminArticleSummary } from './admin-article-summary';
 import { ArticleStatus } from './article-status';
+import { CreateArticleRequest } from './create-article-request';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,13 @@ export class AdminArticleApiService {
     getArticleById(id: number): Observable<AdminArticleDetail> {
       return this.http.get<AdminArticleDetail>(
         `${this.baseUrl}/${id}`
+      );
+    }
+
+    createArticle(request: CreateArticleRequest): Observable<AdminArticleDetail> {
+      return this.http.post<AdminArticleDetail>(
+        this.baseUrl,
+        request
       );
     }
 }

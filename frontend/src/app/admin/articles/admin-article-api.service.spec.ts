@@ -147,5 +147,49 @@ describe('AdminArticleApiService', () => {
     expect(receivedArticle).toEqual(
       expectedArticle
     );
+
+    it('should create an article draft', () => {
+  const requestBody = {
+    title: 'Un nuevo artículo'
+  };
+
+  const expectedArticle: AdminArticleDetail = {
+    id: 110,
+    title: 'Un nuevo artículo',
+    pretitle: null,
+    excerpt: null,
+    body: null,
+    status: 'DRAFT',
+    canBePublished: false,
+    slug: null,
+    publishedAt: null
+  };
+
+  let receivedArticle:
+    AdminArticleDetail | undefined;
+
+  service
+    .createArticle(requestBody)
+    .subscribe(article => {
+      receivedArticle = article;
+    });
+
+  const request = httpTesting.expectOne(
+    '/api/admin/articles'
+  );
+
+  expect(request.request.method).toBe('POST');
+
+  expect(request.request.body).toEqual(
+    requestBody
+  );
+
+  request.flush(expectedArticle);
+
+  expect(receivedArticle).toEqual(
+    expectedArticle
+  );
+  });
+  
   });
 });
