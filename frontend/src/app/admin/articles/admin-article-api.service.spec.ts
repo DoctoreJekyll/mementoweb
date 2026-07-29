@@ -14,6 +14,58 @@ describe('AdminArticleApiService', () => {
   let service: AdminArticleApiService;
   let httpTesting: HttpTestingController;
 
+  it('should update an admin article', () => {
+  const articleId = 110;
+
+  const requestBody = {
+    title: 'Un artículo actualizado',
+    pretitle: 'Ensayo',
+    excerpt: 'Una entradilla completa.',
+    body: 'El cuerpo completo del artículo.'
+  };
+
+  const expectedArticle: AdminArticleDetail = {
+    id: articleId,
+    title: 'Un artículo actualizado',
+    pretitle: 'Ensayo',
+    excerpt: 'Una entradilla completa.',
+    body: 'El cuerpo completo del artículo.',
+    status: 'DRAFT',
+    canBePublished: true,
+    slug: null,
+    publishedAt: null
+  };
+
+  let receivedArticle:
+    AdminArticleDetail | undefined;
+
+    service
+      .updateArticle(
+        articleId,
+        requestBody
+      )
+      .subscribe(article => {
+        receivedArticle = article;
+      });
+
+    const request = httpTesting.expectOne(
+      `/api/admin/articles/${articleId}`
+    );
+
+    expect(request.request.method).toBe('PUT');
+
+    expect(request.request.body).toEqual(
+      requestBody
+    );
+
+    request.flush(expectedArticle);
+
+    expect(receivedArticle).toEqual(
+      expectedArticle
+    );
+  });
+
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [

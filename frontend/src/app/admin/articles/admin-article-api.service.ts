@@ -7,6 +7,7 @@ import { AdminArticleDetail } from './admin-article-detail';
 import { AdminArticleSummary } from './admin-article-summary';
 import { ArticleStatus } from './article-status';
 import { CreateArticleRequest } from './create-article-request';
+import { UpdateArticleRequest } from './update-article-request';
 
 @Injectable({
   providedIn: 'root'
@@ -47,4 +48,11 @@ export class AdminArticleApiService {
         request
       );
     }
+
+    updateArticle(id: number,request: UpdateArticleRequest): Observable<AdminArticleDetail> {
+      return this.http.put<AdminArticleDetail>(
+        `${this.baseUrl}/${id}`,
+         request
+  );
+}
 }
