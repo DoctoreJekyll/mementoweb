@@ -192,3 +192,29 @@
     gap: 1.25rem;
   }
 }
+
+.admin-page__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-page__create-link {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  text-decoration: none;
+}
+
+.admin-page__create-link:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+@media (max-width: 640px) {
+  .admin-page__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

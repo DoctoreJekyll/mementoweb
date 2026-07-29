@@ -1,1 +1,93 @@
-<p>admin-article-create-page works!</p>
+<section class="article-create-page">
+  <header class="article-create-page__header">
+    <a
+      class="article-create-page__back"
+      routerLink="/admin/articulos">
+      ← Volver a artículos
+    </a>
+
+    <p class="article-create-page__eyebrow">
+      Administración
+    </p>
+
+    <h1>Nuevo artículo</h1>
+
+    <p class="article-create-page__description">
+      El artículo se guardará inicialmente como borrador.
+    </p>
+  </header>
+
+  <form
+    class="article-form"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate>
+
+    <div class="form-field">
+      <div class="form-field__heading">
+        <label for="article-title">
+          Título
+        </label>
+
+        <span>
+          {{ titleControl.value.length }}/255
+        </span>
+      </div>
+
+      <input
+        id="article-title"
+        type="text"
+        formControlName="title"
+        maxlength="255"
+        autocomplete="off"
+        placeholder="Título del artículo">
+
+      @if (
+        titleControl.touched
+        && titleControl.invalid
+      ) {
+        <div
+          class="form-field__error"
+          role="alert">
+
+          @if (
+            titleControl.hasError('required')
+            || titleControl.hasError('pattern')
+          ) {
+            El título no puede estar vacío.
+          } @else if (
+            titleControl.hasError('maxlength')
+          ) {
+            El título no puede superar los 255 caracteres.
+          }
+        </div>
+      }
+    </div>
+
+    @if (submitError()) {
+      <div
+        class="form-submit-error"
+        role="alert">
+        No hemos podido crear el artículo.
+        Comprueba que el servidor está disponible.
+      </div>
+    }
+
+    <div class="article-form__actions">
+      <a routerLink="/admin/articulos">
+        Cancelar
+      </a>
+
+      <button
+        type="submit"
+        [disabled]="isSubmitting()">
+
+        @if (isSubmitting()) {
+          Creando…
+        } @else {
+          Crear borrador
+        }
+      </button>
+    </div>
+  </form>
+</section>
