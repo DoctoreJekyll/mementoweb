@@ -1,56 +1,82 @@
-<section class="featured-article">
-  @if (featuredArticle.pretitle) {
-    <p class="featured-article__pretitle">
-      {{ featuredArticle.pretitle }}
+@if (isLoading()) {
+  <section
+    class="page-state"
+    aria-live="polite">
+    <p>Cargando artículos…</p>
+  </section>
+} @else if (loadError()) {
+  <section
+    class="page-state page-state--error"
+    role="alert">
+    <p class="page-state__label">Error</p>
+    <h1>No hemos podido cargar los artículos</h1>
+    <p>
+      Comprueba que el servidor está disponible e inténtalo de nuevo.
     </p>
-  }
-
-  <h1>{{ featuredArticle.title }}</h1>
-
-  <p class="featured-article__excerpt">
-    {{ featuredArticle.excerpt }}
-  </p>
-
-  <time
-    class="featured-article__date"
-    [attr.datetime]="featuredArticle.publishedAt">
-    {{ featuredArticle.publishedAt | date:'dd/MM/yyyy' }}
-  </time>
-</section>
-
-<section class="latest-articles">
-  <header class="latest-articles__header">
-    <p>Archivo</p>
-    <h2>Últimos artículos</h2>
-  </header>
-
-  <div class="article-list">
-    @for (article of articles; track article.slug) {
-      <article class="article-summary">
-        <div class="article-summary__heading">
-          @if (article.pretitle) {
-            <p class="article-summary__pretitle">
-              {{ article.pretitle }}
-            </p>
-          }
-
-          <h3>{{ article.title }}</h3>
-        </div>
-
-        <p class="article-summary__excerpt">
-          {{ article.excerpt }}
-        </p>
-
-        <time
-          class="article-summary__date"
-          [attr.datetime]="article.publishedAt">
-          {{ article.publishedAt | date:'dd/MM/yyyy' }}
-        </time>
-      </article>
-    } @empty {
-      <p class="article-list__empty">
-        Todavía no hay artículos publicados.
+  </section>
+} @else if (featuredArticle(); as featured) {
+  <section class="featured-article">
+    @if (featured.pretitle) {
+      <p class="featured-article__pretitle">
+        {{ featured.pretitle }}
       </p>
     }
-  </div>
-</section>
+
+    <h1>{{ featured.title }}</h1>
+
+    <p class="featured-article__excerpt">
+      {{ featured.excerpt }}
+    </p>
+
+    <time
+      class="featured-article__date"
+      [attr.datetime]="featured.publishedAt">
+      {{ featured.publishedAt | date:'dd/MM/yyyy' }}
+    </time>
+  </section>
+
+  <section class="latest-articles">
+    <header class="latest-articles__header">
+      <p>Archivo</p>
+      <h2>Últimos artículos</h2>
+    </header>
+
+    <div class="article-list">
+      @for (article of articles(); track article.slug) {
+        <article class="article-summary">
+          <div class="article-summary__heading">
+            @if (article.pretitle) {
+              <p class="article-summary__pretitle">
+                {{ article.pretitle }}
+              </p>
+            }
+
+            <h3>{{ article.title }}</h3>
+          </div>
+
+          <p class="article-summary__excerpt">
+            {{ article.excerpt }}
+          </p>
+
+          <time
+            class="article-summary__date"
+            [attr.datetime]="article.publishedAt">
+            {{ article.publishedAt | date:'dd/MM/yyyy' }}
+          </time>
+        </article>
+      } @empty {
+        <p class="article-list__empty">
+          No hay más artículos publicados.
+        </p>
+      }
+    </div>
+  </section>
+} @else {
+  <section class="page-state">
+    <p class="page-state__label">Archivo</p>
+    <h1>Aún no hay artículos publicados</h1>
+    <p>
+      La portada estará disponible cuando se publique el primer texto.
+    </p>
+  </section>
+}

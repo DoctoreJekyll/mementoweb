@@ -1,5 +1,12 @@
-import { Component } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import {
+  Component,
+  inject,
+  signal,
+  type OnInit
+} from '@angular/core';
+
+import { ArticleApiService } from '../../articles/article-api.service';
 import { ArticleSummary } from '../../articles/article-summary';
 
 @Component({
@@ -8,40 +15,44 @@ import { ArticleSummary } from '../../articles/article-summary';
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })
-export class HomePage {
-  protected readonly featuredArticle: ArticleSummary = {
-    slug: 'el-titulo-de-nuestro-primer-articulo',
-    pretitle: 'Ensayo',
-    title: 'El título de nuestro primer artículo',
-    excerpt: 'Una entradilla provisional para empezar a construir la portada.',
-    publishedAt: '2026-07-28T10:00:00Z'
-  };
+export class HomePage implements OnInit {
+  private readonly articleApiService = inject(ArticleApiService);
 
-  protected readonly articles: ArticleSummary[] = [
-    {
-      slug: 'el-valor-de-perderse-en-un-videojuego',
-      pretitle: 'Reflexión',
-      title: 'El valor de perderse en un videojuego',
-      excerpt: 'Sobre los mundos que no tienen miedo de dejar al jugador sin respuestas.',
-      publishedAt: '2026-07-20T10:00:00Z'
-    },
+  protected readonly featuredArticle =
+    signal<ArticleSummary | null>(null);
 
-    {
-      slug: 'cuando-una-interfaz-tambien-forma-parte-de-la-historia',
-      pretitle: 'Artículo',
-      title: 'Cuando una interfaz también forma parte de la historia',
-      excerpt: 'Una reflexión sobre las interfaces que consiguen narrar sin interrumpir.',
-      publishedAt: '2026-07-12T10:00:00Z'
-    },
-    
-    {
-      slug: 'conservar-un-videojuego-en-la-era-digital',
-      pretitle: null,
-      title: 'Conservar un videojuego en la era digital',
-      excerpt: 'Qué perdemos cuando una obra depende para siempre de una tienda o servidor.',
-      publishedAt: '2026-07-04T10:00:00Z'
-    }
+  protected readonly articles =
+    signal<ArticleSummary[]>([]);
 
-  ];
-  
+  protected readonly isLoading = signal(true);
+  protected readonly loadError = signal(false);
+
+  ngOnInit(): void {
+    this.articleApiService
+      .getPublishedArticles(0, 10)
+      .subscribe({
+        next: response => {
+          const [
+            featuredArticle,
+            ...remainingArticles
+          ] = response.content;
+
+          this.featuredArticle.set(
+            featuredArticle ?? null
+          );
+
+          this.articles.set(remainingArticles);
+          this.isLoading.set(false);
+        },
+        error: error => {
+          console.error(
+            'Could not load published articles',
+            error
+          );
+
+          this.loadError.set(true);
+          this.isLoading.set(false);
+        }
+      });
+  }
 }
