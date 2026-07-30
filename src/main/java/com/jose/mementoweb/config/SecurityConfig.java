@@ -29,6 +29,8 @@ public class SecurityConfig {
             .permitAll()
         );
 
+        http.csrf(csrf -> csrf.spa());
+
         http.httpBasic(Customizer.withDefaults());
 
         return http.build();

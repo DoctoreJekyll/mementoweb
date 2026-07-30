@@ -2,8 +2,6 @@ package com.jose.mementoweb.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet
-    .request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet
     .request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet
     .request.MockMvcRequestBuilders.get;
@@ -17,6 +15,8 @@ import static org.springframework.test.web.servlet
     .result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet
     .result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,7 @@ import com.jose.mementoweb.domain.article.ArticleStatus;
 import com.jose.mementoweb.repository.ArticleRepository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.servlet.http.Cookie;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -74,7 +75,7 @@ class ArticleControllerIntegrationTest {
                     articleId
                 )
                 .with(adminUser())
-                .with(csrf()))
+                .with(spaCsrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id")
                 .value(articleId))
@@ -115,7 +116,7 @@ class ArticleControllerIntegrationTest {
                     articleId
                 )
                 .with(adminUser())
-                .with(csrf()))
+                .with(spaCsrf()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id")
                 .value(articleId))
@@ -150,7 +151,7 @@ class ArticleControllerIntegrationTest {
                     savedArticle.getId()
                 )
                 .with(adminUser())
-                .with(csrf()))
+                .with(spaCsrf()))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.title")
                 .value("Invalid article state"))
@@ -168,7 +169,7 @@ class ArticleControllerIntegrationTest {
 
         mockMvc.perform(post("/api/admin/articles")
                 .with(adminUser())
-                .with(csrf())
+                .with(spaCsrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -194,7 +195,7 @@ class ArticleControllerIntegrationTest {
 
         mockMvc.perform(post("/api/admin/articles")
                 .with(adminUser())
-                .with(csrf())
+                .with(spaCsrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -265,7 +266,7 @@ class ArticleControllerIntegrationTest {
                     articleId
                 )
                 .with(adminUser())
-                .with(csrf())
+                .with(spaCsrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -337,5 +338,23 @@ class ArticleControllerIntegrationTest {
     private RequestPostProcessor adminUser() {
         return user("test-admin")
             .roles("ADMIN");
+    }
+
+    private RequestPostProcessor spaCsrf() {
+        return request -> {
+            String token =
+                UUID.randomUUID().toString();
+
+            request.setCookies(
+                new Cookie("XSRF-TOKEN", token)
+            );
+
+            request.addHeader(
+                "X-XSRF-TOKEN",
+                token
+            );
+
+            return request;
+        };
     }
 }
