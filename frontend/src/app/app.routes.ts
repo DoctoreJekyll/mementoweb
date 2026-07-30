@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { adminAuthGuard } from './admin/auth/admin-auth.guard';
 import { AdminArticleCreatePage } from './admin/pages/admin-article-create-page/admin-article-create-page.component';
 import { AdminArticleEditPage } from './admin/pages/admin-article-edit-page/admin-article-edit-page.component';
 import { AdminArticleListPage } from './admin/pages/admin-article-list-page/admin-article-list-page.component';
@@ -22,16 +23,27 @@ export const routes: Routes = [
     component: AdminLoginPage,
   },
   {
-    path: 'admin/articulos/nuevo',
-    component: AdminArticleCreatePage,
-  },
-  {
-    path: 'admin/articulos/:id/editar',
-    component: AdminArticleEditPage,
-  },
-  {
-    path: 'admin/articulos',
-    component: AdminArticleListPage,
+    path: 'admin',
+    canActivateChild: [adminAuthGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'articulos',
+      },
+      {
+        path: 'articulos/nuevo',
+        component: AdminArticleCreatePage,
+      },
+      {
+        path: 'articulos/:id/editar',
+        component: AdminArticleEditPage,
+      },
+      {
+        path: 'articulos',
+        component: AdminArticleListPage,
+      },
+    ],
   },
   {
     path: '**',

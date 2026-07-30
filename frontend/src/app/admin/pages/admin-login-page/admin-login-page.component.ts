@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AdminAuthService } from '../../auth/admin-auth.service';
@@ -18,6 +18,8 @@ export class AdminLoginPage {
   private readonly adminAuthService = inject(AdminAuthService);
 
   private readonly router = inject(Router);
+
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly isSubmitting = signal(false);
 
@@ -55,7 +57,7 @@ export class AdminLoginPage {
       )
       .subscribe({
         next: () => {
-          void this.router.navigate(['/admin/articulos']);
+          void this.router.navigateByUrl(this.getReturnUrl());
         },
 
         error: (error: HttpErrorResponse) => {
@@ -68,5 +70,19 @@ export class AdminLoginPage {
           this.loginError.set('SERVER_ERROR');
         },
       });
+  }
+
+  private getReturnUrl(): string {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
+    const isAdminDestination = returnUrl?.startsWith('/admin/');
+
+    const isLoginPage = returnUrl?.startsWith('/admin/login');
+
+    if (returnUrl && isAdminDestination && !isLoginPage) {
+      return returnUrl;
+    }
+
+    return '/admin/articulos';
   }
 }
