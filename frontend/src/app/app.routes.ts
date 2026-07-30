@@ -10,26 +10,26 @@ import { AdminArticleEditPage } from './admin/pages/admin-article-edit-page/admi
 export const routes: Routes = [
   {
     path: '',
-    component: HomePage
+    component: HomePage,
   },
   {
     path: 'articulos/:slug',
-    component: ArticlePage
+    component: ArticlePage,
   },
   {
-  path: 'admin/articulos/nuevo',
-  component: AdminArticleCreatePage
+    path: 'admin/articulos/nuevo',
+    component: AdminArticleCreatePage,
   },
   {
-  path: 'admin/articulos/:id/editar',
-  component: AdminArticleEditPage
+    path: 'admin/articulos/:id/editar',
+    component: AdminArticleEditPage,
   },
   {
     path: 'admin/articulos',
-    component: AdminArticleListPage
+    component: AdminArticleListPage,
   },
   {
     path: '**',
-    component: NotFoundPage
-  }
+    component: NotFoundPage,
+  },
 ];
