@@ -1,0 +1,58 @@
+<section class="admin-login">
+  <a class="admin-login__back" routerLink="/"> ← Volver a la web </a>
+
+  <header class="admin-login__header">
+    <p class="admin-login__eyebrow">Administración</p>
+
+    <h1>Acceder al editor</h1>
+
+    <p>Introduce tus credenciales para gestionar los artículos de Memento vivere.</p>
+  </header>
+
+  <form class="login-form" [formGroup]="form" (ngSubmit)="login()" novalidate>
+    <div class="form-field">
+      <label for="admin-username"> Usuario </label>
+
+      <input id="admin-username" type="text" formControlName="username" autocomplete="username" />
+
+      @if (form.controls.username.touched && form.controls.username.invalid) {
+        <p class="form-field__error" role="alert">Introduce el nombre de usuario.</p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label for="admin-password"> Contraseña </label>
+
+      <input
+        id="admin-password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+      />
+
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p class="form-field__error" role="alert">Introduce la contraseña.</p>
+      }
+    </div>
+
+    @if (loginError() === 'INVALID_CREDENTIALS') {
+      <div class="login-message login-message--error" role="alert">
+        El usuario o la contraseña no son correctos.
+      </div>
+    }
+
+    @if (loginError() === 'SERVER_ERROR') {
+      <div class="login-message login-message--error" role="alert">
+        No hemos podido conectar con el servidor. Inténtalo de nuevo.
+      </div>
+    }
+
+    <button type="submit" [disabled]="isSubmitting()">
+      @if (isSubmitting()) {
+        Comprobando…
+      } @else {
+        Entrar
+      }
+    </button>
+  </form>
+</section>
