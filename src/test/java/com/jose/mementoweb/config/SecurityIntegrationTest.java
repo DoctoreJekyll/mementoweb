@@ -12,78 +12,85 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+
+import org.springframework.http.HttpHeaders;
+
 @SpringBootTest(properties = {
-        "app.security.admin.username=test-admin",
-        "app.security.admin.password=test-password"
+                "app.security.admin.username=test-admin",
+                "app.security.admin.password=test-password"
 })
 @AutoConfigureMockMvc
 class SecurityIntegrationTest {
 
-    private static final String ADMIN_USERNAME = "test-admin";
+        private static final String ADMIN_USERNAME = "test-admin";
 
-    private static final String ADMIN_PASSWORD = "test-password";
+        private static final String ADMIN_PASSWORD = "test-password";
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Test
-    void shouldReturnAuthenticatedAdminSession()
-            throws Exception {
+        @Test
+        void shouldReturnAuthenticatedAdminSession()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/admin/session")
-                .with(httpBasic(
-                        ADMIN_USERNAME,
-                        ADMIN_PASSWORD)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username")
-                        .value(ADMIN_USERNAME));
-    }
+                mockMvc.perform(get("/api/admin/session")
+                                .with(httpBasic(
+                                                ADMIN_USERNAME,
+                                                ADMIN_PASSWORD)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.username")
+                                                .value(ADMIN_USERNAME));
+        }
 
-    @Test
-    void shouldAllowAnonymousAccessToPublicArticles()
-            throws Exception {
+        @Test
+        void shouldAllowAnonymousAccessToPublicArticles()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/articles"))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(get("/api/articles"))
+                                .andExpect(status().isOk());
+        }
 
-    @Test
-    void shouldRejectAnonymousAccessToAdminArticles()
-            throws Exception {
+        @Test
+        void shouldRejectAnonymousAccessToAdminArticles()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/admin/articles"))
-                .andExpect(status().isUnauthorized());
-    }
+                mockMvc.perform(get("/api/admin/articles"))
+                                .andExpect(status().isUnauthorized());
+        }
 
-    @Test
-    void shouldRejectInvalidAdminCredentials()
-            throws Exception {
+        @Test
+        void shouldRejectInvalidAdminCredentials()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/admin/articles")
-                .with(httpBasic(
-                        ADMIN_USERNAME,
-                        "incorrect-password")))
-                .andExpect(status().isUnauthorized());
-    }
+                mockMvc.perform(get("/api/admin/articles")
+                                .with(httpBasic(
+                                                ADMIN_USERNAME,
+                                                "incorrect-password")))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(
+                                                header().doesNotExist(
+                                                                HttpHeaders.WWW_AUTHENTICATE));
+        }
 
-    @Test
-    void shouldRejectAuthenticatedUserWithoutAdminRole()
-            throws Exception {
+        @Test
+        void shouldRejectAuthenticatedUserWithoutAdminRole()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/admin/articles")
-                .with(user("reader")
-                        .roles("USER")))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(get("/api/admin/articles")
+                                .with(user("reader")
+                                                .roles("USER")))
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    void shouldAllowValidAdminCredentials()
-            throws Exception {
+        @Test
+        void shouldAllowValidAdminCredentials()
+                        throws Exception {
 
-        mockMvc.perform(get("/api/admin/articles")
-                .with(httpBasic(
-                        ADMIN_USERNAME,
-                        ADMIN_PASSWORD)))
-                .andExpect(status().isOk());
-    }
+                mockMvc.perform(get("/api/admin/articles")
+                                .with(httpBasic(
+                                                ADMIN_USERNAME,
+                                                ADMIN_PASSWORD)))
+                                .andExpect(status().isOk());
+        }
 }
