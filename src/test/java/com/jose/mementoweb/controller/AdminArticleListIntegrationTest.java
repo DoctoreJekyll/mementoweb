@@ -21,9 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.repository.ArticleRepository;
 
+import org.springframework.test.context.ActiveProfiles;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 class AdminArticleListIntegrationTest {
 
     @Autowired

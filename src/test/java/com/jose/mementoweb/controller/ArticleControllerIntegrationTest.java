@@ -35,9 +35,12 @@ import com.jose.mementoweb.repository.ArticleRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 
+import org.springframework.test.context.ActiveProfiles;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ActiveProfiles("test")
 class ArticleControllerIntegrationTest {
 
     @Autowired

@@ -3,24 +3,21 @@ package com.jose.mementoweb.config;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-
-import org.springframework.http.HttpHeaders;
-
-@SpringBootTest(properties = {
-                "app.security.admin.username=test-admin",
-                "app.security.admin.password=test-password"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class SecurityIntegrationTest {
 
         private static final String ADMIN_USERNAME = "test-admin";
@@ -56,7 +53,10 @@ class SecurityIntegrationTest {
                         throws Exception {
 
                 mockMvc.perform(get("/api/admin/articles"))
-                                .andExpect(status().isUnauthorized());
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(
+                                                header().doesNotExist(
+                                                                HttpHeaders.WWW_AUTHENTICATE));
         }
 
         @Test
