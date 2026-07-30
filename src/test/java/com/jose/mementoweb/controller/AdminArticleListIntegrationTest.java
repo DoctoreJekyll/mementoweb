@@ -1,5 +1,7 @@
 package com.jose.mementoweb.controller;
 
+import static org.springframework.security.test.web.servlet
+    .request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet
     .request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet
@@ -7,11 +9,13 @@ import static org.springframework.test.web.servlet
 import static org.springframework.test.web.servlet
     .result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jose.mementoweb.domain.article.Article;
@@ -27,6 +31,12 @@ class AdminArticleListIntegrationTest {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @BeforeEach
+    void cleanDatabaseForTest() {
+        articleRepository.deleteAll();
+        articleRepository.flush();
+    }
 
     @Test
     void shouldListAllArticlesOrderedByIdDescending()
@@ -48,7 +58,8 @@ class AdminArticleListIntegrationTest {
         withdrawn.withdraw();
         articleRepository.flush();
 
-        mockMvc.perform(get("/api/admin/articles"))
+        mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()")
                 .value(3))
@@ -79,6 +90,7 @@ class AdminArticleListIntegrationTest {
         );
 
         mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser())
                 .param("status", "DRAFT"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()")
@@ -108,13 +120,16 @@ class AdminArticleListIntegrationTest {
         );
 
         mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser())
                 .param("page", "0")
                 .param("size", "2"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content.length()")
                 .value(2))
-            .andExpect(jsonPath("$.page").value(0))
-            .andExpect(jsonPath("$.size").value(2))
+            .andExpect(jsonPath("$.page")
+                .value(0))
+            .andExpect(jsonPath("$.size")
+                .value(2))
             .andExpect(jsonPath("$.totalElements")
                 .value(3))
             .andExpect(jsonPath("$.totalPages")
@@ -126,10 +141,12 @@ class AdminArticleListIntegrationTest {
             throws Exception {
 
         mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser())
                 .param("page", "-1"))
             .andExpect(status().isBadRequest());
 
         mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser())
                 .param("size", "21"))
             .andExpect(status().isBadRequest());
     }
@@ -139,8 +156,14 @@ class AdminArticleListIntegrationTest {
             throws Exception {
 
         mockMvc.perform(get("/api/admin/articles")
+                .with(adminUser())
                 .param("status", "UNKNOWN"))
             .andExpect(status().isBadRequest());
+    }
+
+    private RequestPostProcessor adminUser() {
+        return user("test-admin")
+            .roles("ADMIN");
     }
 
     private Article createPublishedArticle(
@@ -148,10 +171,18 @@ class AdminArticleListIntegrationTest {
             String slug) {
 
         Article article = new Article(title);
-        article.changeExcerpt("Entradilla de " + title);
-        article.changeBody("Contenido de " + title);
+
+        article.changeExcerpt(
+            "Entradilla de " + title
+        );
+
+        article.changeBody(
+            "Contenido de " + title
+        );
+
         article.publish(slug);
 
-        return articleRepository.saveAndFlush(article);
+        return articleRepository
+            .saveAndFlush(article);
     }
 }

@@ -1,28 +1,38 @@
 package com.jose.mementoweb.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet
+    .request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet
+    .request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet
+    .request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet
+    .request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet
+    .request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet
+    .result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet
+    .result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet
+    .result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-
-import jakarta.persistence.EntityManager;
 
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.domain.article.ArticleStatus;
 import com.jose.mementoweb.repository.ArticleRepository;
 
+import jakarta.persistence.EntityManager;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,9 +48,19 @@ class ArticleControllerIntegrationTest {
     @Autowired
     private EntityManager entityManager;
 
+    @BeforeEach
+    void cleanDatabaseForTest() {
+        articleRepository.deleteAll();
+        articleRepository.flush();
+    }
+
     @Test
-    void shouldPublishArticleThroughApi() throws Exception {
-        Article article = new Article("Artículo publicable");
+    void shouldPublishArticleThroughApi()
+            throws Exception {
+
+        Article article =
+            new Article("Artículo publicable");
+
         article.changeExcerpt("Entradilla");
         article.changeBody("Contenido");
 
@@ -52,9 +72,12 @@ class ArticleControllerIntegrationTest {
         mockMvc.perform(post(
                     "/api/admin/articles/{id}/publish",
                     articleId
-                ))
+                )
+                .with(adminUser())
+                .with(csrf()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(articleId))
+            .andExpect(jsonPath("$.id")
+                .value(articleId))
             .andExpect(jsonPath("$.status")
                 .value("PUBLISHED"))
             .andExpect(jsonPath("$.canBePublished")
@@ -72,8 +95,12 @@ class ArticleControllerIntegrationTest {
     }
 
     @Test
-    void shouldWithdrawArticleThroughApi() throws Exception {
-        Article article = new Article("Artículo publicado");
+    void shouldWithdrawArticleThroughApi()
+            throws Exception {
+
+        Article article =
+            new Article("Artículo publicado");
+
         article.changeExcerpt("Entradilla");
         article.changeBody("Contenido");
         article.publish("mi-articulo-test-1");
@@ -86,9 +113,12 @@ class ArticleControllerIntegrationTest {
         mockMvc.perform(post(
                     "/api/admin/articles/{id}/withdraw",
                     articleId
-                ))
+                )
+                .with(adminUser())
+                .with(csrf()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(articleId))
+            .andExpect(jsonPath("$.id")
+                .value(articleId))
             .andExpect(jsonPath("$.status")
                 .value("WITHDRAWN"))
             .andExpect(jsonPath("$.canBePublished")
@@ -105,12 +135,12 @@ class ArticleControllerIntegrationTest {
             .isEqualTo(ArticleStatus.WITHDRAWN);
     }
 
-
     @Test
     void shouldReturnConflictWhenPublishingIncompleteArticle()
             throws Exception {
 
-        Article article = new Article("Artículo incompleto");
+        Article article =
+            new Article("Artículo incompleto");
 
         Article savedArticle =
             articleRepository.saveAndFlush(article);
@@ -118,7 +148,9 @@ class ArticleControllerIntegrationTest {
         mockMvc.perform(post(
                     "/api/admin/articles/{id}/publish",
                     savedArticle.getId()
-                ))
+                )
+                .with(adminUser())
+                .with(csrf()))
             .andExpect(status().isConflict())
             .andExpect(jsonPath("$.title")
                 .value("Invalid article state"))
@@ -131,8 +163,12 @@ class ArticleControllerIntegrationTest {
     }
 
     @Test
-    void shouldCreateDraftArticle() throws Exception {
+    void shouldCreateDraftArticle()
+            throws Exception {
+
         mockMvc.perform(post("/api/admin/articles")
+                .with(adminUser())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -141,8 +177,11 @@ class ArticleControllerIntegrationTest {
                     """))
             .andExpect(status().isCreated())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id").isNumber())
+                .contentTypeCompatibleWith(
+                    MediaType.APPLICATION_JSON
+                ))
+            .andExpect(jsonPath("$.id")
+                .isNumber())
             .andExpect(jsonPath("$.title")
                 .value("Mi primer artículo"))
             .andExpect(jsonPath("$.status")
@@ -150,8 +189,12 @@ class ArticleControllerIntegrationTest {
     }
 
     @Test
-    void shouldRejectArticleWithBlankTitle() throws Exception {
+    void shouldRejectArticleWithBlankTitle()
+            throws Exception {
+
         mockMvc.perform(post("/api/admin/articles")
+                .with(adminUser())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -161,23 +204,36 @@ class ArticleControllerIntegrationTest {
             .andExpect(status().isBadRequest());
     }
 
-
     @Test
-    void shouldRetrieveArticleById() throws Exception {
-        Article article = new Article("Artículo guardado");
-        article.changePretitle("ENSAYO");
-        article.changeExcerpt("Una pequeña introducción");
-        article.changeBody("Contenido del artículo");
+    void shouldRetrieveArticleById()
+            throws Exception {
 
-        Article savedArticle = articleRepository.saveAndFlush(article);
+        Article article =
+            new Article("Artículo guardado");
+
+        article.changePretitle("ENSAYO");
+
+        article.changeExcerpt(
+            "Una pequeña introducción"
+        );
+
+        article.changeBody(
+            "Contenido del artículo"
+        );
+
+        Article savedArticle =
+            articleRepository.saveAndFlush(article);
 
         mockMvc.perform(get(
                     "/api/admin/articles/{id}",
                     savedArticle.getId()
-                ))
+                )
+                .with(adminUser()))
             .andExpect(status().isOk())
             .andExpect(content()
-                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .contentTypeCompatibleWith(
+                    MediaType.APPLICATION_JSON
+                ))
             .andExpect(jsonPath("$.id")
                 .value(savedArticle.getId()))
             .andExpect(jsonPath("$.title")
@@ -193,15 +249,23 @@ class ArticleControllerIntegrationTest {
     }
 
     @Test
-    void shouldUpdateArticle() throws Exception {
-        Article article = new Article("Título anterior");
-        Article savedArticle = articleRepository.saveAndFlush(article);
+    void shouldUpdateArticle()
+            throws Exception {
+
+        Article article =
+            new Article("Título anterior");
+
+        Article savedArticle =
+            articleRepository.saveAndFlush(article);
+
         Long articleId = savedArticle.getId();
 
         mockMvc.perform(put(
                     "/api/admin/articles/{id}",
                     articleId
                 )
+                .with(adminUser())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {
@@ -212,7 +276,8 @@ class ArticleControllerIntegrationTest {
                     }
                     """))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(articleId))
+            .andExpect(jsonPath("$.id")
+                .value(articleId))
             .andExpect(jsonPath("$.title")
                 .value("Título actualizado"))
             .andExpect(jsonPath("$.pretitle")
@@ -227,19 +292,22 @@ class ArticleControllerIntegrationTest {
         entityManager.flush();
         entityManager.clear();
 
-        Article updatedArticle = articleRepository.findById(articleId)
-            .orElseThrow();
+        Article updatedArticle =
+            articleRepository.findById(articleId)
+                .orElseThrow();
 
         assertThat(updatedArticle.getTitle())
             .isEqualTo("Título actualizado");
+
         assertThat(updatedArticle.getPretitle())
             .isEqualTo("REFLEXIÓN");
+
         assertThat(updatedArticle.getExcerpt())
             .isEqualTo("Nueva entradilla");
+
         assertThat(updatedArticle.getBody())
             .isEqualTo("Nuevo contenido");
     }
-
 
     @Test
     void shouldReturnNotFoundWhenArticleDoesNotExist()
@@ -250,14 +318,24 @@ class ArticleControllerIntegrationTest {
         mockMvc.perform(get(
                     "/api/admin/articles/{id}",
                     missingArticleId
-                ))
+                )
+                .with(adminUser()))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.title")
                 .value("Article not found"))
             .andExpect(jsonPath("$.status")
                 .value(404))
             .andExpect(jsonPath("$.detail")
-                .value("Article not found" + " (Article ID: " + missingArticleId + ")"));
+                .value(
+                    "Article not found"
+                    + " (Article ID: "
+                    + missingArticleId
+                    + ")"
+                ));
     }
 
+    private RequestPostProcessor adminUser() {
+        return user("test-admin")
+            .roles("ADMIN");
+    }
 }

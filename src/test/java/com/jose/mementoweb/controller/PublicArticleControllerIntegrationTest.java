@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet
 import static org.springframework.test.web.servlet
     .result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,12 @@ class PublicArticleControllerIntegrationTest {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @BeforeEach
+    void cleanDatabaseForTest() {
+        articleRepository.deleteAll();
+        articleRepository.flush();
+    }
 
     @Test
     void shouldListOnlyPublishedArticlesInPublicationOrder()
