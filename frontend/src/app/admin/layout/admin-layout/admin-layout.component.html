@@ -1,0 +1,22 @@
+<div class="admin-shell">
+  <header class="admin-shell__header">
+    <a class="admin-shell__identity" routerLink="/admin/articulos">
+      <span>Administración</span>
+      <strong>Memento vivere</strong>
+    </a>
+
+    <div class="admin-shell__session">
+      @if (username(); as currentUsername) {
+        <span class="admin-shell__username">
+          {{ currentUsername }}
+        </span>
+      }
+
+      <a routerLink="/"> Ver web pública </a>
+
+      <button class="admin-shell__logout" type="button" (click)="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <router-outlet />
+</div>

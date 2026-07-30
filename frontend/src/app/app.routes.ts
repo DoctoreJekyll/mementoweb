@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { adminAuthGuard } from './admin/auth/admin-auth.guard';
+import { AdminLayout } from './admin/layout/admin-layout/admin-layout.component';
 import { AdminArticleCreatePage } from './admin/pages/admin-article-create-page/admin-article-create-page.component';
 import { AdminArticleEditPage } from './admin/pages/admin-article-edit-page/admin-article-edit-page.component';
 import { AdminArticleListPage } from './admin/pages/admin-article-list-page/admin-article-list-page.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    component: AdminLayout,
     canActivateChild: [adminAuthGuard],
     children: [
       {
