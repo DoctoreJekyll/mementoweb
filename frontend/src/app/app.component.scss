@@ -43,13 +43,31 @@
   font-size: 0.875rem;
 }
 
-.site-footer p {
+.site-footer__content {
   width: min(
     calc(100% - 2rem),
     var(--content-width)
   );
 
-  margin: 0 auto;
+  margin-inline: auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.site-footer__content p {
+  margin: 0;
+}
+
+.site-footer__content a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.site-footer__content a:hover {
+  color: var(--color-accent);
 }
 
 @media (max-width: 640px) {
