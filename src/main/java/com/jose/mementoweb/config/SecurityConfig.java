@@ -24,14 +24,64 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/articles/**")
                 .permitAll()
+
+                .requestMatchers(
+                        "/api/auth/csrf",
+                        "/api/admin/login")
+                .permitAll()
+
                 .requestMatchers("/api/admin/**")
                 .hasRole("ADMIN")
+
                 .anyRequest()
                 .permitAll());
 
         http.csrf(csrf -> csrf.spa());
 
         http.httpBasic(httpBasic -> httpBasic
+                .authenticationEntryPoint(
+                        new HttpStatusEntryPoint(
+                                HttpStatus.UNAUTHORIZED)));
+
+        http.formLogin(form -> form
+                .loginProcessingUrl("/api/admin/login")
+
+                .successHandler((
+                        request,
+                        response,
+                        authentication) -> {
+
+                    response.setStatus(
+                            HttpStatus.NO_CONTENT.value());
+                })
+
+                .failureHandler((
+                        request,
+                        response,
+                        exception) -> {
+
+                    response.setStatus(
+                            HttpStatus.UNAUTHORIZED.value());
+                })
+
+                .permitAll());
+
+        http.logout(logout -> logout
+                .logoutUrl("/api/admin/logout")
+
+                .logoutSuccessHandler((
+                        request,
+                        response,
+                        authentication) -> {
+
+                    response.setStatus(
+                            HttpStatus.NO_CONTENT.value());
+                })
+
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID"));
+
+        http.exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint(
                         new HttpStatusEntryPoint(
                                 HttpStatus.UNAUTHORIZED)));
