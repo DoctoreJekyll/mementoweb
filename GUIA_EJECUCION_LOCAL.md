@@ -239,6 +239,7 @@ docker compose up -d postgres
 
 # Terminal 2 — raíz del repositorio
 .\mvnw.cmd spring-boot:run
+.\mvnw.cmd clean spring-boot:run
 
 $env:MEMENTO_ADMIN_USERNAME = "admin"
 $env:MEMENTO_ADMIN_PASSWORD = "admin"
