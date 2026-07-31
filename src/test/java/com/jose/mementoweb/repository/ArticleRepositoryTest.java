@@ -12,10 +12,15 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.domain.article.ArticleStatus;
 
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+
+import com.jose.mementoweb.config.TestcontainersConfiguration;
+
 @DataJpaTest
-@AutoConfigureTestDatabase(
-    replace = AutoConfigureTestDatabase.Replace.NONE
-)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+@Import(TestcontainersConfiguration.class)
 class ArticleRepositoryTest {
 
     @Autowired
@@ -34,12 +39,12 @@ class ArticleRepositoryTest {
         entityManager.clear();
 
         Article retrievedArticle = articleRepository.findById(articleId)
-            .orElseThrow();
+                .orElseThrow();
 
         assertThat(articleId).isNotNull();
         assertThat(retrievedArticle.getTitle())
-            .isEqualTo("Mi primer artículo");
+                .isEqualTo("Mi primer artículo");
         assertThat(retrievedArticle.getStatus())
-            .isEqualTo(ArticleStatus.DRAFT);
+                .isEqualTo(ArticleStatus.DRAFT);
     }
 }
