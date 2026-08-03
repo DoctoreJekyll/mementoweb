@@ -1,5 +1,6 @@
 package com.jose.mementoweb.domain.article;
 
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
@@ -17,9 +18,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "articles")
 public class Article {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false, length = 255)
     private String title;
 
@@ -39,11 +41,14 @@ public class Article {
     @Column(length = 300, unique = true)
     private String slug;
 
-    @Column(
-        name = "published_at",
-        columnDefinition = "TIMESTAMP WITH TIME ZONE"
-    )
+    @Column(name = "published_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     private OffsetDateTime publishedAt;
+
+    @Column(name = "cover_image_url", columnDefinition = "TEXT")
+    private String coverImageUrl;
+
+    @Column(name = "cover_image_alt", length = 500)
+    private String coverImageAlt;
 
     protected Article() {
         // JPA requires a default constructor
@@ -80,14 +85,20 @@ public class Article {
         return body;
     }
 
-    public String getSlug()
-    {
+    public String getSlug() {
         return slug;
     }
-    
-    public OffsetDateTime getPublishedAt()
-    {
+
+    public OffsetDateTime getPublishedAt() {
         return publishedAt;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public String getCoverImageAlt() {
+        return coverImageAlt;
     }
 
     private void validateTitle(String title) {
@@ -108,8 +119,7 @@ public class Article {
     public void changeExcerpt(String excerpt) {
         if (this.status == ArticleStatus.PUBLISHED && valueIsNullOrBlank(excerpt)) {
             throw new ArticleStateException(
-                "A published article must have an excerpt"
-            );
+                    "A published article must have an excerpt");
         }
 
         this.excerpt = excerpt;
@@ -118,13 +128,11 @@ public class Article {
     public void changeBody(String body) {
         if (this.status == ArticleStatus.PUBLISHED && valueIsNullOrBlank(body)) {
             throw new ArticleStateException(
-                "A published article must have a body"
-            );
+                    "A published article must have a body");
         }
 
         this.body = body;
     }
-
 
     private boolean valueIsNullOrBlank(String value) {
         return value == null || value.isBlank();
@@ -132,17 +140,16 @@ public class Article {
 
     private boolean hasRequiredContent() {
         return !valueIsNullOrBlank(this.title)
-            && !valueIsNullOrBlank(this.excerpt)
-            && !valueIsNullOrBlank(this.body);
+                && !valueIsNullOrBlank(this.excerpt)
+                && !valueIsNullOrBlank(this.body);
     }
 
     public boolean canBePublished() {
-        boolean hasPublishableStatus =
-            this.status == ArticleStatus.DRAFT
-            || this.status == ArticleStatus.WITHDRAWN;
+        boolean hasPublishableStatus = this.status == ArticleStatus.DRAFT
+                || this.status == ArticleStatus.WITHDRAWN;
 
         return hasPublishableStatus
-            && hasRequiredContent();
+                && hasRequiredContent();
     }
 
     public void publish(String generatedSlug) {
@@ -150,14 +157,12 @@ public class Article {
                 && this.status != ArticleStatus.WITHDRAWN) {
 
             throw new ArticleStateException(
-                "Only draft or withdrawn articles can be published"
-            );
+                    "Only draft or withdrawn articles can be published");
         }
 
         if (!hasRequiredContent()) {
             throw new ArticleStateException(
-                "Article is not ready to be published"
-            );
+                    "Article is not ready to be published");
         }
 
         if (this.slug == null) {
@@ -169,7 +174,6 @@ public class Article {
         this.status = ArticleStatus.PUBLISHED;
     }
 
-    
     public void withdraw() {
         if (this.status != ArticleStatus.PUBLISHED) {
             throw new ArticleStateException("Only published articles can be withdrawn");
@@ -177,29 +181,74 @@ public class Article {
         this.status = ArticleStatus.WITHDRAWN;
     }
 
-
     private void setPublishedAtIfAbsent() {
         if (this.publishedAt == null) {
-            this.publishedAt =
-                OffsetDateTime.now(ZoneOffset.UTC);
+            this.publishedAt = OffsetDateTime.now(ZoneOffset.UTC);
         }
     }
 
     private void assignSlug(String slug) {
         if (valueIsNullOrBlank(slug)) {
             throw new IllegalArgumentException(
-                "Slug cannot be null or blank"
-            );
+                    "Slug cannot be null or blank");
         }
 
         if (this.slug != null) {
             throw new ArticleStateException(
-                "Article already has a slug"
-            );
+                    "Article already has a slug");
         }
 
         this.slug = slug;
     }
 
+    public void changeCoverImage(
+            String coverImageUrl,
+            String coverImageAlt) {
+
+        boolean hasImageUrl = !valueIsNullOrBlank(coverImageUrl);
+
+        boolean hasImageAlt = !valueIsNullOrBlank(coverImageAlt);
+
+        if (hasImageUrl != hasImageAlt) {
+            throw new IllegalArgumentException(
+                    "Cover image URL and alternative text must be provided together");
+        }
+
+        if (!hasImageUrl) {
+            this.coverImageUrl = null;
+            this.coverImageAlt = null;
+            return;
+        }
+
+        validateCoverImageUrl(coverImageUrl);
+
+        this.coverImageUrl = coverImageUrl.trim();
+        this.coverImageAlt = coverImageAlt.trim();
+    }
+
+    private void validateCoverImageUrl(
+            String coverImageUrl) {
+
+        try {
+            URI uri = URI.create(
+                    coverImageUrl.trim());
+
+            boolean hasAllowedScheme = "http".equalsIgnoreCase(
+                    uri.getScheme())
+                    || "https".equalsIgnoreCase(
+                            uri.getScheme());
+
+            if (!hasAllowedScheme
+                    || uri.getHost() == null) {
+
+                throw new IllegalArgumentException(
+                        "Cover image URL must be an absolute HTTP or HTTPS URL");
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException(
+                    "Cover image URL must be an absolute HTTP or HTTPS URL",
+                    exception);
+        }
+    }
 
 }
