@@ -24,7 +24,6 @@ public class ArticleService {
         this.slugGenerator = slugGenerator;
     }
 
-
     @Transactional
     public Article createArticle(String title) {
         Article article = new Article(title);
@@ -33,8 +32,7 @@ public class ArticleService {
     }
 
     private Article findArticleOrThrow(Long id) {
-        Optional<Article> article =
-            articleRepository.findById(id);
+        Optional<Article> article = articleRepository.findById(id);
 
         if (article.isEmpty()) {
             throw new ArticleNotFoundException("Article not found", id);
@@ -49,7 +47,15 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article updateArticle(Long id, String title, String pretitle, String excerpt, String body) {
+    public Article updateArticle(
+            Long id,
+            String title,
+            String pretitle,
+            String excerpt,
+            String body,
+            String coverImageUrl,
+            String coverImageAlt) {
+
         Article article = findArticleOrThrow(id);
 
         article.changeTitle(title);
@@ -57,9 +63,13 @@ public class ArticleService {
         article.changeExcerpt(excerpt);
         article.changeBody(body);
 
+        article.changeCoverImage(
+                coverImageUrl,
+                coverImageAlt);
+
         return article;
     }
-    
+
     @Transactional
     public Article publishArticle(Long id) {
         Article article = findArticleOrThrow(id);
@@ -68,9 +78,8 @@ public class ArticleService {
 
         if (publicationSlug == null) {
             publicationSlug = slugGenerator.generate(
-                article.getTitle(),
-                article.getId()
-            );
+                    article.getTitle(),
+                    article.getId());
         }
 
         article.publish(publicationSlug);
@@ -79,17 +88,16 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article withdrawArticle(Long id){
+    public Article withdrawArticle(Long id) {
         Article article = findArticleOrThrow(id);
         article.withdraw();
         return article;
     }
 
-
     @Transactional(readOnly = true)
     public Page<Article> getArticles(Pageable pageable) {
         return articleRepository
-            .findAllByOrderByIdDesc(pageable);
+                .findAllByOrderByIdDesc(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -98,11 +106,9 @@ public class ArticleService {
             Pageable pageable) {
 
         return articleRepository
-            .findByStatusOrderByIdDesc(
-                status,
-                pageable
-            );
+                .findByStatusOrderByIdDesc(
+                        status,
+                        pageable);
     }
-
 
 }

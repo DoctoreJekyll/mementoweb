@@ -56,8 +56,10 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdminArticleResponse> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
-        Article updatedArticle = articleService.updateArticle(id, request.title(), request.pretitle(), request.excerpt(), request.body());
+    public ResponseEntity<AdminArticleResponse> updateArticle(@PathVariable Long id,
+            @Valid @RequestBody UpdateArticleRequest request) {
+        Article updatedArticle = articleService.updateArticle(id, request.title(), request.pretitle(),
+                request.excerpt(), request.body(), request.coverImageUrl(), request.coverImageAlt());
         AdminArticleResponse response = AdminArticleResponse.from(updatedArticle);
         return ResponseEntity.ok(response);
     }
@@ -69,38 +71,36 @@ public class ArticleController {
         return ResponseEntity.ok(response);
     }
 
-
     @PostMapping("/{id}/withdraw")
     public ResponseEntity<AdminArticleResponse> withdrawArticle(@PathVariable Long id) {
         Article article = articleService.withdrawArticle(id);
         AdminArticleResponse response = AdminArticleResponse.from(article);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping
-    public ResponseEntity<PageResponse<AdminArticleSummaryResponse>>
-    getArticles(@RequestParam(defaultValue = "0") @Min(0) int page, @RequestParam(defaultValue = "10") @Min(1) @Max(20) int size,
-                    @RequestParam(required = false) ArticleStatus status){
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Article> articlePage;
+    public ResponseEntity<PageResponse<AdminArticleSummaryResponse>> getArticles(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(20) int size,
+            @RequestParam(required = false) ArticleStatus status) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Article> articlePage;
 
-            if (status == null) {
-                articlePage = articleService.getArticles(pageable);
-            }else{
-                articlePage = articleService.getArticlesByStatus(status, pageable);
-            }
-
-
-            List<AdminArticleSummaryResponse> summaries = new ArrayList<>();
-            for(Article article : articlePage.getContent()){
-                AdminArticleSummaryResponse summary = AdminArticleSummaryResponse.from(article);
-                summaries.add(summary);
-            }
-
-            PageResponse<AdminArticleSummaryResponse> response = PageResponse.from(summaries, articlePage);
-
-            return ResponseEntity.ok(response);
+        if (status == null) {
+            articlePage = articleService.getArticles(pageable);
+        } else {
+            articlePage = articleService.getArticlesByStatus(status, pageable);
         }
-    
+
+        List<AdminArticleSummaryResponse> summaries = new ArrayList<>();
+        for (Article article : articlePage.getContent()) {
+            AdminArticleSummaryResponse summary = AdminArticleSummaryResponse.from(article);
+            summaries.add(summary);
+        }
+
+        PageResponse<AdminArticleSummaryResponse> response = PageResponse.from(summaries, articlePage);
+
+        return ResponseEntity.ok(response);
+    }
 
 }

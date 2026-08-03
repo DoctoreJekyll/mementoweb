@@ -5,17 +5,20 @@ import java.time.OffsetDateTime;
 import com.jose.mementoweb.domain.article.Article;
 
 //Detalle administrativo
-public record AdminArticleResponse(Long id, String title, String pretitle, String excerpt, String body, String status, boolean canBePublished, String slug, OffsetDateTime publishedAt) {
+public record AdminArticleResponse(Long id, String title, String pretitle, String excerpt, String body, String status,
+        boolean canBePublished, String slug, OffsetDateTime publishedAt, String coverImageUrl,
+        String coverImageAlt) {
     public static AdminArticleResponse from(Article article) {
-        return new AdminArticleResponse(article.getId(), 
-        article.getTitle(), 
-        article.getPretitle(), 
-        article.getExcerpt(), 
-        article.getBody(), 
-        article.getStatus().name(),
-        article.canBePublished(),
-        article.getSlug(),
-        article.getPublishedAt()
-    );
+        return new AdminArticleResponse(article.getId(),
+                article.getTitle(),
+                article.getPretitle(),
+                article.getExcerpt(),
+                article.getBody(),
+                article.getStatus().name(),
+                article.canBePublished(),
+                article.getSlug(),
+                article.getPublishedAt(),
+                article.getCoverImageUrl(),
+                article.getCoverImageAlt());
     }
 }
