@@ -13,14 +13,17 @@ import { NotFoundPage } from './pages/not-found-page/not-found-page.component';
 export const routes: Routes = [
   {
     path: '',
+    title: 'Memento vivere — Videojuegos, cultura y memoria',
     component: HomePage,
   },
   {
     path: 'articulos/:slug',
+    title: 'Artículo | Memento vivere',
     component: ArticlePage,
   },
   {
     path: 'admin/login',
+    title: 'Acceso | Memento vivere',
     component: AdminLoginPage,
   },
   {
@@ -35,20 +38,24 @@ export const routes: Routes = [
       },
       {
         path: 'articulos/nuevo',
+        title: 'Nuevo artículo | Memento vivere',
         component: AdminArticleCreatePage,
       },
       {
         path: 'articulos/:id/editar',
+        title: 'Editar artículo | Memento vivere',
         component: AdminArticleEditPage,
       },
       {
         path: 'articulos',
+        title: 'Artículos | Administración | Memento vivere',
         component: AdminArticleListPage,
       },
     ],
   },
   {
     path: '**',
+    title: 'Página no encontrada | Memento vivere',
     component: NotFoundPage,
   },
 ];
