@@ -40,6 +40,17 @@
       </time>
     </header>
 
+    @if (currentArticle.coverImageUrl && currentArticle.coverImageAlt) {
+      <figure class="article-page__cover">
+        <img
+          [src]="currentArticle.coverImageUrl"
+          [alt]="currentArticle.coverImageAlt"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    }
+
     <div class="article-page__body">
       @for (paragraph of bodyParagraphs(); track $index) {
         <p>{{ paragraph }}</p>
