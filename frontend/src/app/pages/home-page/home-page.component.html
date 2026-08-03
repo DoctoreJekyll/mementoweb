@@ -9,7 +9,9 @@
     class="page-state page-state--error"
     role="alert">
     <p class="page-state__label">Error</p>
+
     <h1>No hemos podido cargar los artículos</h1>
+
     <p>
       Comprueba que el servidor está disponible e inténtalo de nuevo.
     </p>
@@ -37,6 +39,24 @@
       [attr.datetime]="featured.publishedAt">
       {{ featured.publishedAt | date:'dd/MM/yyyy' }}
     </time>
+
+    @if (
+      featured.coverImageUrl
+      && featured.coverImageAlt
+    ) {
+      <a
+        class="featured-article__cover-link"
+        [routerLink]="['/articulos', featured.slug]">
+
+        <img
+          class="featured-article__cover"
+          [src]="featured.coverImageUrl"
+          [alt]="featured.coverImageAlt"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async">
+      </a>
+    }
   </section>
 
   <section class="latest-articles">
@@ -46,8 +66,37 @@
     </header>
 
     <div class="article-list">
-      @for (article of articles(); track article.slug) {
-        <article class="article-summary">
+      @for (
+        article of articles();
+        track article.slug
+      ) {
+        <article
+          class="article-summary"
+          [class.article-summary--with-image]="
+            !!article.coverImageUrl
+            && !!article.coverImageAlt
+          ">
+
+          @if (
+            article.coverImageUrl
+            && article.coverImageAlt
+          ) {
+            <a
+              class="article-summary__cover-link"
+              [routerLink]="[
+                '/articulos',
+                article.slug
+              ]">
+
+              <img
+                class="article-summary__cover"
+                [src]="article.coverImageUrl"
+                [alt]="article.coverImageAlt"
+                loading="lazy"
+                decoding="async">
+            </a>
+          }
+
           <div class="article-summary__heading">
             @if (article.pretitle) {
               <p class="article-summary__pretitle">
@@ -56,7 +105,11 @@
             }
 
             <h3>
-              <a [routerLink]="['/articulos', article.slug]">
+              <a
+                [routerLink]="[
+                  '/articulos',
+                  article.slug
+                ]">
                 {{ article.title }}
               </a>
             </h3>
@@ -82,7 +135,9 @@
 } @else {
   <section class="page-state">
     <p class="page-state__label">Archivo</p>
+
     <h1>Aún no hay artículos publicados</h1>
+
     <p>
       La portada estará disponible cuando se publique el primer texto.
     </p>
