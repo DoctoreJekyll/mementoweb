@@ -3,10 +3,7 @@
 }
 
 .article-page {
-  width: min(
-    calc(100% - 2rem),
-    var(--content-width)
-  );
+  width: min(calc(100% - 2rem), var(--content-width));
   margin-inline: auto;
 }
 
@@ -66,6 +63,7 @@
   padding-block: clamp(3.5rem, 8vw, 7rem);
 }
 
+
 .article-page__body p {
   margin: 0;
   font-family: Georgia, 'Times New Roman', serif;
@@ -74,12 +72,14 @@
   white-space: pre-line;
 }
 
+
+.article-page__body p + p {
+  margin-top: 1.75em;
+}
+
 .article-state {
   display: flex;
-  width: min(
-    calc(100% - 2rem),
-    var(--reading-width)
-  );
+  width: min(calc(100% - 2rem), var(--reading-width));
   min-height: 60vh;
   margin-inline: auto;
   padding-block: 4rem;

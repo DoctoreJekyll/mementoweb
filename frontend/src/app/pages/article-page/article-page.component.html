@@ -1,43 +1,27 @@
 @if (isLoading()) {
-  <section
-    class="article-state"
-    aria-live="polite">
+  <section class="article-state" aria-live="polite">
     <p>Cargando artículo…</p>
   </section>
 } @else if (notFound()) {
   <section class="article-state">
     <p class="article-state__label">404</p>
     <h1>Este artículo no existe</h1>
-    <p>
-      Puede que haya sido retirado o que la dirección no sea correcta.
-    </p>
+    <p>Puede que haya sido retirado o que la dirección no sea correcta.</p>
 
-    <a routerLink="/">
-      Volver a la portada
-    </a>
+    <a routerLink="/"> Volver a la portada </a>
   </section>
 } @else if (loadError()) {
-  <section
-    class="article-state article-state--error"
-    role="alert">
+  <section class="article-state article-state--error" role="alert">
     <p class="article-state__label">Error</p>
     <h1>No hemos podido cargar el artículo</h1>
-    <p>
-      Comprueba que el servidor está disponible e inténtalo de nuevo.
-    </p>
+    <p>Comprueba que el servidor está disponible e inténtalo de nuevo.</p>
 
-    <a routerLink="/">
-      Volver a la portada
-    </a>
+    <a routerLink="/"> Volver a la portada </a>
   </section>
 } @else if (article(); as currentArticle) {
   <article class="article-page">
     <header class="article-page__header">
-      <a
-        class="article-page__back"
-        routerLink="/">
-        ← Volver a la portada
-      </a>
+      <a class="article-page__back" routerLink="/"> ← Volver a la portada </a>
 
       @if (currentArticle.pretitle) {
         <p class="article-page__pretitle">
@@ -51,15 +35,15 @@
         {{ currentArticle.excerpt }}
       </p>
 
-      <time
-        class="article-page__date"
-        [attr.datetime]="currentArticle.publishedAt">
-        {{ currentArticle.publishedAt | date:'dd/MM/yyyy' }}
+      <time class="article-page__date" [attr.datetime]="currentArticle.publishedAt">
+        {{ currentArticle.publishedAt | date: 'dd/MM/yyyy' }}
       </time>
     </header>
 
     <div class="article-page__body">
-      <p>{{ currentArticle.body }}</p>
+      @for (paragraph of bodyParagraphs(); track $index) {
+        <p>{{ paragraph }}</p>
+      }
     </div>
   </article>
 }

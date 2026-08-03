@@ -1,67 +1,40 @@
 @if (isLoading()) {
-  <section
-    class="editor-state"
-    aria-live="polite">
+  <section class="editor-state" aria-live="polite">
     <p>Cargando artículo…</p>
   </section>
 } @else if (notFound()) {
   <section class="editor-state">
-    <p class="editor-state__label">
-      404
-    </p>
+    <p class="editor-state__label">404</p>
 
     <h1>Este artículo no existe</h1>
 
-    <p>
-      El identificador no corresponde con ningún artículo.
-    </p>
+    <p>El identificador no corresponde con ningún artículo.</p>
 
-    <a routerLink="/admin/articulos">
-      Volver a artículos
-    </a>
+    <a routerLink="/admin/articulos"> Volver a artículos </a>
   </section>
 } @else if (loadError()) {
-  <section
-    class="editor-state editor-state--error"
-    role="alert">
-
-    <p class="editor-state__label">
-      Error
-    </p>
+  <section class="editor-state editor-state--error" role="alert">
+    <p class="editor-state__label">Error</p>
 
     <h1>No hemos podido cargar el artículo</h1>
 
-    <p>
-      Comprueba que el servidor está disponible.
-    </p>
+    <p>Comprueba que el servidor está disponible.</p>
 
-    <button
-      type="button"
-      (click)="reloadArticle()">
-      Volver a intentarlo
-    </button>
+    <button type="button" (click)="reloadArticle()">Volver a intentarlo</button>
   </section>
 } @else if (article(); as currentArticle) {
   <section class="article-editor">
     <header class="article-editor__header">
-      <a
-        class="article-editor__back"
-        routerLink="/admin/articulos">
-        ← Volver a artículos
-      </a>
+      <a class="article-editor__back" routerLink="/admin/articulos"> ← Volver a artículos </a>
 
       <div class="article-editor__identity">
         <div>
-          <p class="article-editor__eyebrow">
-            Administración · ID {{ currentArticle.id }}
-          </p>
+          <p class="article-editor__eyebrow">Administración · ID {{ currentArticle.id }}</p>
 
           <h1>Editar artículo</h1>
         </div>
 
-        <span
-          class="article-status"
-          [attr.data-status]="currentArticle.status">
+        <span class="article-status" [attr.data-status]="currentArticle.status">
           {{ statusLabels[currentArticle.status] }}
         </span>
       </div>
@@ -77,57 +50,40 @@
       }
     </header>
 
-    <section
-      class="editorial-actions"
-      aria-labelledby="editorial-actions-title">
-
+    <section class="editorial-actions" aria-labelledby="editorial-actions-title">
       <div class="editorial-actions__content">
         <div>
-          <p class="editorial-actions__eyebrow">
-            Publicación
-          </p>
+          <p class="editorial-actions__eyebrow">Publicación</p>
 
-          <h2 id="editorial-actions-title">
-            Estado editorial
-          </h2>
+          <h2 id="editorial-actions-title">Estado editorial</h2>
 
           @if (form.dirty) {
             <p class="editorial-actions__warning">
-              Guarda los cambios antes de modificar
-              el estado del artículo.
+              Guarda los cambios antes de modificar el estado del artículo.
             </p>
-          } @else if (
-            currentArticle.status !== 'PUBLISHED'
-            && !currentArticle.canBePublished
-          ) {
+          } @else if (currentArticle.status !== 'PUBLISHED' && !currentArticle.canBePublished) {
             <p class="editorial-actions__description">
-              El artículo necesita título, entradilla
-              y cuerpo para poder publicarse.
+              El artículo necesita título, entradilla y cuerpo para poder publicarse.
             </p>
           }
         </div>
 
         <div class="editorial-actions__buttons">
-          @if (
-            currentArticle.status === 'DRAFT'
-            || currentArticle.status === 'WITHDRAWN'
-          ) {
+          @if (currentArticle.status === 'DRAFT' || currentArticle.status === 'WITHDRAWN') {
             <button
               type="button"
               class="editorial-action editorial-action--publish"
               [disabled]="
-                !currentArticle.canBePublished
-                || form.dirty
-                || isSaving()
-                || statusAction() !== null
+                !currentArticle.canBePublished ||
+                form.dirty ||
+                isSaving() ||
+                statusAction() !== null
               "
-              (click)="publishArticle()">
-
+              (click)="publishArticle()"
+            >
               @if (statusAction() === 'PUBLISH') {
                 Publicando…
-              } @else if (
-                currentArticle.status === 'WITHDRAWN'
-              ) {
+              } @else if (currentArticle.status === 'WITHDRAWN') {
                 Volver a publicar
               } @else {
                 Publicar artículo
@@ -139,10 +95,8 @@
             @if (currentArticle.slug) {
               <a
                 class="editorial-action editorial-action--view"
-                [routerLink]="[
-                  '/articulos',
-                  currentArticle.slug
-                ]">
+                [routerLink]="['/articulos', currentArticle.slug]"
+              >
                 Ver publicado
               </a>
             }
@@ -150,13 +104,9 @@
             <button
               type="button"
               class="editorial-action editorial-action--withdraw"
-              [disabled]="
-                form.dirty
-                || isSaving()
-                || statusAction() !== null
-              "
-              (click)="withdrawArticle()">
-
+              [disabled]="form.dirty || isSaving() || statusAction() !== null"
+              (click)="withdrawArticle()"
+            >
               @if (statusAction() === 'WITHDRAW') {
                 Retirando…
               } @else {
@@ -168,37 +118,24 @@
       </div>
 
       @if (statusChangeMessage(); as message) {
-        <p
-          class="status-change-message status-change-message--success"
-          role="status">
+        <p class="status-change-message status-change-message--success" role="status">
           {{ message }}
         </p>
       }
 
       @if (statusChangeError()) {
-        <p
-          class="status-change-message status-change-message--error"
-          role="alert">
+        <p class="status-change-message status-change-message--error" role="alert">
           No hemos podido cambiar el estado del artículo.
         </p>
       }
     </section>
 
-    <form
-      class="article-form"
-      [formGroup]="form"
-      (ngSubmit)="saveArticle()"
-      novalidate>
-
+    <form class="article-form" [formGroup]="form" (ngSubmit)="saveArticle()" novalidate>
       <div class="form-field">
         <div class="form-field__heading">
-          <label for="article-title">
-            Título
-          </label>
+          <label for="article-title"> Título </label>
 
-          <span>
-            {{ titleControl.value.length }}/255
-          </span>
+          <span> {{ titleControl.value.length }}/255 </span>
         </div>
 
         <input
@@ -206,24 +143,14 @@
           type="text"
           formControlName="title"
           maxlength="255"
-          autocomplete="off">
+          autocomplete="off"
+        />
 
-        @if (
-          titleControl.touched
-          && titleControl.invalid
-        ) {
-          <p
-            class="form-field__error"
-            role="alert">
-
-            @if (
-              titleControl.hasError('required')
-              || titleControl.hasError('pattern')
-            ) {
+        @if (titleControl.touched && titleControl.invalid) {
+          <p class="form-field__error" role="alert">
+            @if (titleControl.hasError('required') || titleControl.hasError('pattern')) {
               El título no puede estar vacío.
-            } @else if (
-              titleControl.hasError('maxlength')
-            ) {
+            } @else if (titleControl.hasError('maxlength')) {
               El título no puede superar los 255 caracteres.
             }
           </p>
@@ -232,13 +159,9 @@
 
       <div class="form-field">
         <div class="form-field__heading">
-          <label for="article-pretitle">
-            Antetítulo
-          </label>
+          <label for="article-pretitle"> Antetítulo </label>
 
-          <span>
-            {{ pretitleControl.value.length }}/255
-          </span>
+          <span> {{ pretitleControl.value.length }}/255 </span>
         </div>
 
         <input
@@ -247,85 +170,62 @@
           formControlName="pretitle"
           maxlength="255"
           autocomplete="off"
-          placeholder="Ensayo, reflexión, opinión…">
+          placeholder="Ensayo, reflexión, opinión…"
+        />
 
-        @if (
-          pretitleControl.touched
-          && pretitleControl.hasError('maxlength')
-        ) {
-          <p
-            class="form-field__error"
-            role="alert">
+        @if (pretitleControl.touched && pretitleControl.hasError('maxlength')) {
+          <p class="form-field__error" role="alert">
             El antetítulo no puede superar los 255 caracteres.
           </p>
         }
       </div>
 
       <div class="form-field">
-        <label for="article-excerpt">
-          Entradilla
-        </label>
+        <label for="article-excerpt"> Entradilla </label>
 
-        <p class="form-field__help">
-          Es el resumen que aparecerá en la portada.
-        </p>
+        <p class="form-field__help">Es el resumen que aparecerá en la portada.</p>
 
         <textarea
           id="article-excerpt"
           formControlName="excerpt"
           rows="5"
-          placeholder="Una introducción breve al artículo…">
+          placeholder="Una introducción breve al artículo…"
+        >
         </textarea>
       </div>
 
       <div class="form-field">
-        <label for="article-body">
-          Cuerpo
-        </label>
+        <label for="article-body"> Cuerpo </label>
 
         <p class="form-field__help">
-          Por ahora trabajaremos con texto plano y saltos de línea.
+          Escribe en texto plano y separa los párrafos dejando una línea en blanco.
         </p>
 
         <textarea
           id="article-body"
           formControlName="body"
           rows="18"
-          placeholder="Empieza a escribir el artículo…">
+          placeholder="Empieza a escribir el artículo…"
+        >
         </textarea>
       </div>
 
-      @if (
-        saveSuccess()
-        && form.pristine
-      ) {
-        <p
-          class="save-message save-message--success"
-          role="status">
+      @if (saveSuccess() && form.pristine) {
+        <p class="save-message save-message--success" role="status">
           Cambios guardados correctamente.
         </p>
       }
 
       @if (saveError()) {
-        <p
-          class="save-message save-message--error"
-          role="alert">
+        <p class="save-message save-message--error" role="alert">
           No hemos podido guardar los cambios.
         </p>
       }
 
       <div class="article-form__actions">
-        <a routerLink="/admin/articulos">
-          Volver sin guardar
-        </a>
+        <a routerLink="/admin/articulos"> Volver sin guardar </a>
 
-        <button
-          type="submit"
-          [disabled]="
-            isSaving()
-            || form.pristine
-          ">
-
+        <button type="submit" [disabled]="isSaving() || form.pristine">
           @if (isSaving()) {
             Guardando…
           } @else {
