@@ -10,4 +10,6 @@ export interface AdminArticleDetail {
   canBePublished: boolean;
   slug: string | null;
   publishedAt: string | null;
+  coverImageUrl: string | null;
+  coverImageAlt: string | null;
 }

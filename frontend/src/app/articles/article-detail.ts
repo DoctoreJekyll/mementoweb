@@ -4,5 +4,9 @@ export interface ArticleDetail {
   pretitle: string | null;
   excerpt: string;
   body: string;
+
+  coverImageUrl: string | null;
+  coverImageAlt: string | null;
+
   publishedAt: string;
 }
