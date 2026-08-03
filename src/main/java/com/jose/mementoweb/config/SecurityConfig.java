@@ -38,11 +38,6 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.spa());
 
-        http.httpBasic(httpBasic -> httpBasic
-                .authenticationEntryPoint(
-                        new HttpStatusEntryPoint(
-                                HttpStatus.UNAUTHORIZED)));
-
         http.formLogin(form -> form
                 .loginProcessingUrl("/api/admin/login")
 
