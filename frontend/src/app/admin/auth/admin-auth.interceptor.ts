@@ -1,57 +1,65 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpInterceptorFn
+} from '@angular/common/http';
+
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+
+import {
+  catchError,
+  throwError
+} from 'rxjs';
 
 import { AdminAuthService } from './admin-auth.service';
 
-export const adminAuthInterceptor: HttpInterceptorFn = (request, next) => {
-  const isAdminRequest = request.url.startsWith('/api/admin/');
+export const adminAuthInterceptor:
+  HttpInterceptorFn = (request, next) => {
 
-  if (!isAdminRequest) {
-    return next(request);
-  }
+  const adminAuthService =
+    inject(AdminAuthService);
 
-  const alreadyHasAuthorization = request.headers.has('Authorization');
-
-  if (alreadyHasAuthorization) {
-    return next(request);
-  }
-
-  const adminAuthService = inject(AdminAuthService);
   const router = inject(Router);
 
-  const authorizationHeader = adminAuthService.getAuthorizationHeader();
+  const isAdminRequest =
+    request.url.startsWith('/api/admin/');
 
-  if (!authorizationHeader) {
-    return next(request);
-  }
+  const isLoginRequest =
+    request.url === '/api/admin/login';
 
-  const authenticatedRequest = request.clone({
-    setHeaders: {
-      Authorization: authorizationHeader,
-    },
-  });
-
-  return next(authenticatedRequest).pipe(
+  return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && adminAuthService.isAuthenticated()) {
+      const sessionHasExpired =
+        isAdminRequest
+        && !isLoginRequest
+        && error.status === 401
+        && adminAuthService.isAuthenticated();
+
+      if (sessionHasExpired) {
         const currentUrl = router.url;
 
         const returnUrl =
-          currentUrl.startsWith('/admin') && !currentUrl.startsWith('/admin/login')
+          currentUrl.startsWith('/admin')
+          && !currentUrl.startsWith(
+            '/admin/login'
+          )
             ? currentUrl
             : '/admin/articulos';
 
-        adminAuthService.logout();
+        adminAuthService.clearSession();
 
-        void router.navigate(['/admin/login'], {
-          queryParams: { returnUrl },
-          replaceUrl: true,
-        });
+        void router.navigate(
+          ['/admin/login'],
+          {
+            queryParams: {
+              returnUrl
+            },
+            replaceUrl: true
+          }
+        );
       }
 
       return throwError(() => error);
-    }),
+    })
   );
 };
