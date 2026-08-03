@@ -229,25 +229,27 @@ public class Article {
     private void validateCoverImageUrl(
             String coverImageUrl) {
 
+        URI uri;
+
         try {
-            URI uri = URI.create(
+            uri = URI.create(
                     coverImageUrl.trim());
-
-            boolean hasAllowedScheme = "http".equalsIgnoreCase(
-                    uri.getScheme())
-                    || "https".equalsIgnoreCase(
-                            uri.getScheme());
-
-            if (!hasAllowedScheme
-                    || uri.getHost() == null) {
-
-                throw new IllegalArgumentException(
-                        "Cover image URL must be an absolute HTTP or HTTPS URL");
-            }
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(
                     "Cover image URL must be an absolute HTTP or HTTPS URL",
                     exception);
+        }
+
+        boolean hasAllowedScheme = "http".equalsIgnoreCase(
+                uri.getScheme())
+                || "https".equalsIgnoreCase(
+                        uri.getScheme());
+
+        if (!hasAllowedScheme
+                || uri.getHost() == null) {
+
+            throw new IllegalArgumentException(
+                    "Cover image URL must be an absolute HTTP or HTTPS URL");
         }
     }
 
