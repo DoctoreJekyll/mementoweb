@@ -17,9 +17,8 @@ public class ApiExceptionHandler {
             ArticleNotFoundException exception) {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-            HttpStatus.NOT_FOUND,
-            exception.getMessage()
-        );
+                HttpStatus.NOT_FOUND,
+                exception.getMessage());
 
         problem.setTitle("Article not found");
 
@@ -31,9 +30,8 @@ public class ApiExceptionHandler {
             ArticleStateException exception) {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-            HttpStatus.CONFLICT,
-            exception.getMessage()
-        );
+                HttpStatus.CONFLICT,
+                exception.getMessage());
 
         problem.setTitle("Invalid article state");
 
@@ -45,11 +43,23 @@ public class ApiExceptionHandler {
             PublishedArticleNotFoundException exception) {
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-            HttpStatus.NOT_FOUND,
-            exception.getMessage()
-        );
+                HttpStatus.NOT_FOUND,
+                exception.getMessage());
 
         problem.setTitle("Published article not found");
+
+        return problem;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgumentException(
+            IllegalArgumentException exception) {
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage());
+
+        problem.setTitle("Invalid request");
 
         return problem;
     }
