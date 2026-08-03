@@ -3,4 +3,6 @@ export interface UpdateArticleRequest {
   pretitle: string | null;
   excerpt: string | null;
   body: string | null;
+  coverImageUrl: string | null;
+  coverImageAlt: string | null;
 }

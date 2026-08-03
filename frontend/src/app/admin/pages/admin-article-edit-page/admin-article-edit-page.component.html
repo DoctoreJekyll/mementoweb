@@ -194,6 +194,73 @@
         </textarea>
       </div>
 
+      <fieldset class="cover-image-fields">
+        <legend>Imagen de portada</legend>
+
+        <p class="form-field__help">
+          Introduce la dirección pública de una imagen y una descripción para lectores que no puedan
+          verla.
+        </p>
+
+        <div class="form-field">
+          <label for="article-cover-image-url"> URL de la imagen </label>
+
+          <input
+            id="article-cover-image-url"
+            type="url"
+            formControlName="coverImageUrl"
+            autocomplete="off"
+            placeholder="https://ejemplo.com/imagen.jpg"
+          />
+
+          @if (coverImageUrlControl.touched && coverImageUrlControl.hasError('absoluteHttpUrl')) {
+            <p class="form-field__error" role="alert">
+              Introduce una URL completa que empiece por http:// o https://.
+            </p>
+          }
+        </div>
+
+        <div class="form-field">
+          <div class="form-field__heading">
+            <label for="article-cover-image-alt"> Texto alternativo </label>
+
+            <span> {{ coverImageAltControl.value.length }}/500 </span>
+          </div>
+
+          <input
+            id="article-cover-image-alt"
+            type="text"
+            formControlName="coverImageAlt"
+            maxlength="500"
+            autocomplete="off"
+            placeholder="Describe brevemente lo que aparece en la imagen"
+          />
+
+          @if (coverImageAltControl.touched && coverImageAltControl.hasError('maxlength')) {
+            <p class="form-field__error" role="alert">
+              El texto alternativo no puede superar los 500 caracteres.
+            </p>
+          }
+        </div>
+
+        @if (
+          (coverImageUrlControl.touched || coverImageAltControl.touched) &&
+          form.hasError('coverImagePair')
+        ) {
+          <p class="form-field__error" role="alert">
+            La URL y el texto alternativo deben rellenarse juntos.
+          </p>
+        }
+
+        @if (coverImagePreviewUrl; as imageUrl) {
+          <figure class="cover-image-preview">
+            <img [src]="imageUrl" [alt]="coverImageAltControl.value.trim()" />
+
+            <figcaption>Previsualización de la portada</figcaption>
+          </figure>
+        }
+      </fieldset>
+
       <div class="form-field">
         <label for="article-body"> Cuerpo </label>
 
