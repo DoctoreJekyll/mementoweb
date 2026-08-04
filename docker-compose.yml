@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: mementoweb
       POSTGRES_PASSWORD: mementoweb
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - mementoweb-postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -15,6 +15,30 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "8081:8081"
+
+    environment:
+      PORT: 8081
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mementoweb
+      SPRING_DATASOURCE_USERNAME: mementoweb
+      SPRING_DATASOURCE_PASSWORD: mementoweb
+
+      MEMENTO_ADMIN_USERNAME: ${MEMENTO_ADMIN_USERNAME:?required}
+      MEMENTO_ADMIN_PASSWORD: ${MEMENTO_ADMIN_PASSWORD:?required}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
 
 
 volumes:
