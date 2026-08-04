@@ -3,18 +3,21 @@
 }
 
 .article-page {
-  width: min(calc(100% - 2rem), var(--content-width));
+  width: min(
+    calc(100% - 2rem),
+    var(--content-width)
+  );
   margin-inline: auto;
 }
 
 .article-page__header {
-  padding-block: clamp(3.5rem, 9vw, 7rem);
+  padding-block: clamp(3rem, 6vw, 5rem);
   border-bottom: 1px solid var(--color-line);
 }
 
 .article-page__back {
   display: inline-block;
-  margin-bottom: clamp(3rem, 7vw, 6rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
   color: var(--color-muted);
   font-size: 0.8125rem;
   text-decoration: none;
@@ -57,12 +60,35 @@
   font-size: 0.8125rem;
 }
 
+/*
+ * La figura funciona como una ventana horizontal.
+ * Su tamaño está limitado y se centra dentro del artículo.
+ */
+.article-page__cover {
+  width: min(100%, 960px);
+  aspect-ratio: 16 / 9;
+  margin:
+    clamp(2rem, 4vw, 3.5rem)
+    auto
+    0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.article-page__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
 .article-page__body {
   width: min(100%, var(--reading-width));
   margin-inline: auto;
-  padding-block: clamp(3.5rem, 8vw, 7rem);
+  padding-block: clamp(2.5rem, 4vw, 3.5rem);
 }
-
 
 .article-page__body p {
   margin: 0;
@@ -72,14 +98,16 @@
   white-space: pre-line;
 }
 
-
 .article-page__body p + p {
   margin-top: 1.75em;
 }
 
 .article-state {
   display: flex;
-  width: min(calc(100% - 2rem), var(--reading-width));
+  width: min(
+    calc(100% - 2rem),
+    var(--reading-width)
+  );
   min-height: 60vh;
   margin-inline: auto;
   padding-block: 4rem;
@@ -127,20 +155,4 @@
 a:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 4px;
-}
-
-.article-page__cover {
-  margin:
-    clamp(2.5rem, 6vw, 5rem)
-    0
-    0;
-}
-
-.article-page__cover img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
 }
