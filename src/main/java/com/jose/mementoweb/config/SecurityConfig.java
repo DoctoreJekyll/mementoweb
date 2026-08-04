@@ -30,6 +30,9 @@ public class SecurityConfig {
                         "/api/admin/login")
                 .permitAll()
 
+                .requestMatchers("actuator/health")
+                .permitAll()
+
                 .requestMatchers("/api/admin/**")
                 .hasRole("ADMIN")
 
