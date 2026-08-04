@@ -30,7 +30,7 @@ public class SecurityConfig {
                         "/api/admin/login")
                 .permitAll()
 
-                .requestMatchers("actuator/health")
+                .requestMatchers("/actuator/health")
                 .permitAll()
 
                 .requestMatchers("/api/admin/**")

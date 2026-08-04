@@ -2,19 +2,26 @@ services:
   postgres:
     image: postgres:16
     container_name: mementoweb-postgres
+
     environment:
       POSTGRES_DB: mementoweb
       POSTGRES_USER: mementoweb
       POSTGRES_PASSWORD: mementoweb
+
     ports:
       - "127.0.0.1:5433:5432"
+
     volumes:
       - mementoweb-postgres-data:/var/lib/postgresql/data
+
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mementoweb -d mementoweb"]
-      interval: 5s
+      test:
+        - CMD-SHELL
+        - pg_isready -U mementoweb -d mementoweb
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   app:
     build:
@@ -38,8 +45,16 @@ services:
       postgres:
         condition: service_healthy
 
-    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -qO- http://localhost:8081/actuator/health | grep -q '"status":"UP"'
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
+    restart: unless-stopped
 
 volumes:
   mementoweb-postgres-data:
