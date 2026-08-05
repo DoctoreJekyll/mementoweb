@@ -11,13 +11,13 @@
 }
 
 .article-page__header {
-  padding-block: clamp(3rem, 6vw, 5rem);
+  padding-block: clamp(2.75rem, 5vw, 4.5rem);
   border-bottom: 1px solid var(--color-line);
 }
 
 .article-page__back {
   display: inline-block;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
   color: var(--color-muted);
   font-size: 0.8125rem;
   text-decoration: none;
@@ -28,7 +28,7 @@
 }
 
 .article-page__pretitle {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
   color: var(--color-accent);
   font-size: 0.75rem;
   font-weight: 700;
@@ -38,11 +38,11 @@
 
 .article-page h1 {
   max-width: 1050px;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(2.75rem, 7vw, 6rem);
-  line-height: 0.96;
-  letter-spacing: -0.05em;
+  font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
 }
 
 .article-page__excerpt {
@@ -158,9 +158,9 @@ a:focus-visible {
   grid-template-columns:
     minmax(0, 1fr)
     auto;
-  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
-  padding: clamp(1.5rem, 4vw, 2.25rem);
-  gap: 1.5rem;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  padding: clamp(1.15rem, 3vw, 1.75rem);
+  gap: 1rem;
   align-items: center;
   border-top: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
@@ -169,10 +169,10 @@ a:focus-visible {
 }
 
 .article-page__audio-label {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   color: var(--color-accent);
   font-family: inherit;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.12em;
@@ -183,7 +183,7 @@ a:focus-visible {
   margin: 0;
   color: var(--color-ink);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
 }
