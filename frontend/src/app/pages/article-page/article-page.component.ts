@@ -11,6 +11,8 @@ import { Meta, Title } from '@angular/platform-browser';
 import { ArticleApiService } from '../../articles/article-api.service';
 import { ArticleDetail } from '../../articles/article-detail';
 
+import { ArticleMarkdownService } from '../../articles/article-markdown.service';
+
 @Component({
   selector: 'app-article-page',
   imports: [DatePipe, RouterLink],
@@ -37,18 +39,11 @@ export class ArticlePage implements OnInit, OnDestroy {
 
   protected readonly loadError = signal(false);
 
-  protected readonly bodyParagraphs = computed(() => {
-    const body = this.article()?.body;
+  private readonly articleMarkdownService = inject(ArticleMarkdownService);
 
-    if (!body) {
-      return [];
-    }
-
-    return body
-      .split(/\r?\n\s*\r?\n/)
-      .map((paragraph) => paragraph.trim())
-      .filter((paragraph) => paragraph.length > 0);
-  });
+  protected readonly bodyHtml = computed(() =>
+    this.articleMarkdownService.toSafeHtml(this.article()?.body),
+  );
 
   ngOnInit(): void {
     const slug = this.route.snapshot.paramMap.get('slug');

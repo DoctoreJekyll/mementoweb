@@ -86,18 +86,6 @@
   padding-block: clamp(2.5rem, 4vw, 3.5rem);
 }
 
-.article-page__body p {
-  margin: 0;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
-  line-height: 1.8;
-  white-space: pre-line;
-}
-
-.article-page__body p + p {
-  margin-top: 1.75em;
-}
-
 .article-state {
   display: flex;
   width: min(

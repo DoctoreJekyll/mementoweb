@@ -79,9 +79,8 @@
         </aside>
       }
 
-      @for (paragraph of bodyParagraphs(); track $index) {
-        <p>{{ paragraph }}</p>
-      }
+      <div class="article-page__content" [innerHTML]="bodyHtml()"></div>
+
     </div>
   </article>
 }
