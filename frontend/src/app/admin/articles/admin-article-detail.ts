@@ -12,4 +12,7 @@ export interface AdminArticleDetail {
   publishedAt: string | null;
   coverImageUrl: string | null;
   coverImageAlt: string | null;
+  recommendedAudioTitle: string | null;
+  recommendedAudioAuthor: string | null;
+  recommendedAudioUrl: string | null;
 }
