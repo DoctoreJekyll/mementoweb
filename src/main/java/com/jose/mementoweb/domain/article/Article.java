@@ -50,6 +50,15 @@ public class Article {
     @Column(name = "cover_image_alt", length = 500)
     private String coverImageAlt;
 
+    @Column(name = "recommended_audio_title", length = 255)
+    private String recommendedAudioTitle;
+
+    @Column(name = "recommended_audio_author", length = 255)
+    private String recommendedAudioAuthor;
+
+    @Column(name = "recommended_audio_url", columnDefinition = "TEXT")
+    private String recommendedAudioUrl;
+
     protected Article() {
         // JPA requires a default constructor
     }
@@ -99,6 +108,18 @@ public class Article {
 
     public String getCoverImageAlt() {
         return coverImageAlt;
+    }
+
+    public String getRecommendedAudioTitle() {
+        return recommendedAudioTitle;
+    }
+
+    public String getRecommendedAudioAuthor() {
+        return recommendedAudioAuthor;
+    }
+
+    public String getRecommendedAudioUrl() {
+        return recommendedAudioUrl;
     }
 
     private void validateTitle(String title) {
@@ -220,36 +241,64 @@ public class Article {
             return;
         }
 
-        validateCoverImageUrl(coverImageUrl);
+        validateExternalUrl(
+                coverImageUrl,
+                "Cover image URL must be an absolute HTTP or HTTPS URL");
 
         this.coverImageUrl = coverImageUrl.trim();
         this.coverImageAlt = coverImageAlt.trim();
     }
 
-    private void validateCoverImageUrl(
-            String coverImageUrl) {
+    public void changeRecommendedAudio(String audioTitle, String audioAuthor, String audioUrl) {
 
+        boolean hasTitle = !valueIsNullOrBlank(audioTitle);
+
+        boolean hasAuthor = !valueIsNullOrBlank(audioAuthor);
+
+        boolean hasUrl = !valueIsNullOrBlank(audioUrl);
+
+        if (!hasTitle && !hasAuthor && !hasUrl) {
+            this.recommendedAudioTitle = null;
+            this.recommendedAudioAuthor = null;
+            this.recommendedAudioUrl = null;
+            return;
+        }
+
+        if (!hasTitle || !hasUrl) {
+            throw new IllegalArgumentException(
+                    "Recommended audio title and URL must be provided together");
+        }
+
+        validateExternalUrl(
+                audioUrl,
+                "Recommended audio URL must be an absolute HTTP or HTTPS URL");
+
+        this.recommendedAudioTitle = audioTitle.trim();
+
+        this.recommendedAudioAuthor = hasAuthor
+                ? audioAuthor.trim()
+                : null;
+
+        this.recommendedAudioUrl = audioUrl.trim();
+    }
+
+    private void validateExternalUrl(String url, String errorMessage) {
         URI uri;
 
         try {
-            uri = URI.create(
-                    coverImageUrl.trim());
+            uri = URI.create(url.trim());
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(
-                    "Cover image URL must be an absolute HTTP or HTTPS URL",
+                    errorMessage,
                     exception);
         }
 
-        boolean hasAllowedScheme = "http".equalsIgnoreCase(
-                uri.getScheme())
-                || "https".equalsIgnoreCase(
-                        uri.getScheme());
+        boolean hasAllowedScheme = "http".equalsIgnoreCase(uri.getScheme())
+                || "https".equalsIgnoreCase(uri.getScheme());
 
-        if (!hasAllowedScheme
-                || uri.getHost() == null) {
-
+        if (!hasAllowedScheme || uri.getHost() == null) {
             throw new IllegalArgumentException(
-                    "Cover image URL must be an absolute HTTP or HTTPS URL");
+                    errorMessage);
         }
     }
 

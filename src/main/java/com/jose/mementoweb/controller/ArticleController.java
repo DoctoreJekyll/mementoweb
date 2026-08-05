@@ -56,10 +56,11 @@ public class ArticleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdminArticleResponse> updateArticle(@PathVariable Long id,
-            @Valid @RequestBody UpdateArticleRequest request) {
+    public ResponseEntity<AdminArticleResponse> updateArticle(@PathVariable Long id, @Valid @RequestBody UpdateArticleRequest request) {
         Article updatedArticle = articleService.updateArticle(id, request.title(), request.pretitle(),
-                request.excerpt(), request.body(), request.coverImageUrl(), request.coverImageAlt());
+                request.excerpt(), request.body(), request.coverImageUrl(), request.coverImageAlt(), request.recommendedAudioTitle(),
+                request.recommendedAudioAuthor(), request.recommendedAudioUrl());
+                
         AdminArticleResponse response = AdminArticleResponse.from(updatedArticle);
         return ResponseEntity.ok(response);
     }

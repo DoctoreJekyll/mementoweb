@@ -12,6 +12,9 @@ $env:MEMENTO_ADMIN_USERNAME="TU_USUARIO"
 $env:MEMENTO_ADMIN_PASSWORD="UNA_CONTRASEÑA_SEGURA"
 ```
 
+app completa con docker
+docker compose up --build -d
+
 Estas variables solo existen en la terminal actual. No deben guardarse en Git ni escribirse directamente en `application.properties` o `docker-compose.yml`.
 
 Levanta la aplicación y PostgreSQL:

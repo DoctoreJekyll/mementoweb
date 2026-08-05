@@ -5,14 +5,19 @@ import jakarta.validation.constraints.Size;
 
 //Crear borrador
 public record UpdateArticleRequest(
-        @NotBlank @Size(max = 255) String title,
+                @NotBlank @Size(max = 255) String title,
 
-        @Size(max = 255) String pretitle,
+                @Size(max = 255) String pretitle,
 
-        String excerpt,
-        String body,
+                String excerpt,
+                String body,
 
-        @Size(max = 2048) String coverImageUrl,
+                @Size(max = 2048) String coverImageUrl,
 
-        @Size(max = 500) String coverImageAlt) {
+                @Size(max = 500) String coverImageAlt,
+                @Size(max = 255) String recommendedAudioTitle,
+
+                @Size(max = 255) String recommendedAudioAuthor,
+
+                @Size(max = 2048) String recommendedAudioUrl) {
 }

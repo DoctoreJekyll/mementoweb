@@ -54,7 +54,10 @@ public class ArticleService {
             String excerpt,
             String body,
             String coverImageUrl,
-            String coverImageAlt) {
+            String coverImageAlt,
+            String recommendedAudioTitle,
+            String recommendedAudioAuthor,
+            String recommendedAudioUrl) {
 
         Article article = findArticleOrThrow(id);
 
@@ -66,6 +69,11 @@ public class ArticleService {
         article.changeCoverImage(
                 coverImageUrl,
                 coverImageAlt);
+
+        article.changeRecommendedAudio(
+                recommendedAudioTitle,
+                recommendedAudioAuthor,
+                recommendedAudioUrl);
 
         return article;
     }
