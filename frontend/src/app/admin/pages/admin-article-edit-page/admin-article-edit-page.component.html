@@ -261,6 +261,136 @@
         }
       </fieldset>
 
+      <fieldset class="recommended-audio-fields">
+        <legend>Audio recomendado</legend>
+
+        <p class="form-field__help">
+          Añade una pieza, álbum o lista de reproducción para acompañar la lectura. El título y el
+          enlace son obligatorios; el autor es opcional.
+        </p>
+
+        <div class="form-field">
+          <div class="form-field__heading">
+            <label for="article-audio-title"> Título del audio </label>
+
+            <span> {{ recommendedAudioTitleControl.value.length }}/255 </span>
+          </div>
+
+          <input
+            id="article-audio-title"
+            type="text"
+            formControlName="recommendedAudioTitle"
+            maxlength="255"
+            autocomplete="off"
+            placeholder="Minecraft Volume Alpha"
+          />
+
+          @if (
+            recommendedAudioTitleControl.touched &&
+            recommendedAudioTitleControl.hasError('maxlength')
+          ) {
+            <p class="form-field__error" role="alert">
+              El título del audio no puede superar los 255 caracteres.
+            </p>
+          }
+        </div>
+
+        <div class="form-field">
+          <div class="form-field__heading">
+            <label for="article-audio-author">
+              Autor o canal
+              <span class="form-field__optional"> Opcional </span>
+            </label>
+
+            <span> {{ recommendedAudioAuthorControl.value.length }}/255 </span>
+          </div>
+
+          <input
+            id="article-audio-author"
+            type="text"
+            formControlName="recommendedAudioAuthor"
+            maxlength="255"
+            autocomplete="off"
+            placeholder="C418"
+          />
+
+          @if (
+            recommendedAudioAuthorControl.touched &&
+            recommendedAudioAuthorControl.hasError('maxlength')
+          ) {
+            <p class="form-field__error" role="alert">
+              El autor no puede superar los 255 caracteres.
+            </p>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="article-audio-url"> Enlace </label>
+
+          <input
+            id="article-audio-url"
+            type="url"
+            formControlName="recommendedAudioUrl"
+            maxlength="2048"
+            inputmode="url"
+            autocomplete="off"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
+
+          @if (recommendedAudioUrlControl.touched) {
+            @if (recommendedAudioUrlControl.hasError('absoluteHttpUrl')) {
+              <p class="form-field__error" role="alert">
+                Introduce una URL completa que empiece por http:// o https://.
+              </p>
+            } @else if (recommendedAudioUrlControl.hasError('maxlength')) {
+              <p class="form-field__error" role="alert">
+                El enlace no puede superar los 2048 caracteres.
+              </p>
+            }
+          }
+        </div>
+
+        @if (
+          (recommendedAudioTitleControl.touched ||
+            recommendedAudioAuthorControl.touched ||
+            recommendedAudioUrlControl.touched) &&
+          form.hasError('recommendedAudio')
+        ) {
+          <p class="form-field__error" role="alert">
+            Para recomendar un audio debes rellenar juntos el título y el enlace.
+          </p>
+        }
+
+        @if (
+          recommendedAudioTitleControl.value.trim() &&
+          recommendedAudioUrlControl.value.trim() &&
+          recommendedAudioUrlControl.valid &&
+          !form.hasError('recommendedAudio')
+        ) {
+          <aside class="recommended-audio-preview">
+            <p class="recommended-audio-preview__label">Audio recomendado</p>
+
+            <p class="recommended-audio-preview__title">
+              {{ recommendedAudioTitleControl.value.trim() }}
+            </p>
+
+            @if (recommendedAudioAuthorControl.value.trim()) {
+              <p class="recommended-audio-preview__author">
+                {{ recommendedAudioAuthorControl.value.trim() }}
+              </p>
+            }
+
+            <a
+              [href]="recommendedAudioUrlControl.value.trim()"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Escuchar ↗
+            </a>
+          </aside>
+        }
+      </fieldset>
+
       <div class="form-field">
         <label for="article-body"> Cuerpo </label>
 
