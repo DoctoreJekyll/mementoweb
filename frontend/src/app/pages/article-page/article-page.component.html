@@ -52,6 +52,33 @@
     }
 
     <div class="article-page__body">
+      @if (currentArticle.recommendedAudioTitle && currentArticle.recommendedAudioUrl) {
+        <aside class="article-page__audio" aria-labelledby="recommended-audio-title">
+          <div class="article-page__audio-content">
+            <p class="article-page__audio-label">Audio recomendado</p>
+
+            <h2 id="recommended-audio-title" class="article-page__audio-title">
+              {{ currentArticle.recommendedAudioTitle }}
+            </h2>
+
+            @if (currentArticle.recommendedAudioAuthor) {
+              <p class="article-page__audio-author">
+                {{ currentArticle.recommendedAudioAuthor }}
+              </p>
+            }
+          </div>
+
+          <a
+            class="article-page__audio-link"
+            [href]="currentArticle.recommendedAudioUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Escuchar audio ↗
+          </a>
+        </aside>
+      }
+
       @for (paragraph of bodyParagraphs(); track $index) {
         <p>{{ paragraph }}</p>
       }
