@@ -9,6 +9,7 @@ import { AdminLoginPage } from './admin/pages/admin-login-page/admin-login-page.
 import { ArticlePage } from './pages/article-page/article-page.component';
 import { HomePage } from './pages/home-page/home-page.component';
 import { NotFoundPage } from './pages/not-found-page/not-found-page.component';
+import { pendingChangesGuard } from './admin/guards/pending-changes.guard';
 
 export const routes: Routes = [
   {
@@ -45,6 +46,7 @@ export const routes: Routes = [
         path: 'articulos/:id/editar',
         title: 'Editar artículo | Memento vivere',
         component: AdminArticleEditPage,
+        canDeactivate: [pendingChangesGuard],
       },
       {
         path: 'articulos',

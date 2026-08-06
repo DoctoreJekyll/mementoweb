@@ -1,9 +1,4 @@
-import {
-  Component,
-  inject,
-  signal,
-  type OnInit,
-} from '@angular/core';
+import { Component, inject, signal, type OnInit } from '@angular/core';
 
 import {
   AbstractControl,
@@ -15,10 +10,9 @@ import {
   Validators,
 } from '@angular/forms';
 
-import {
-  ActivatedRoute,
-  RouterLink,
-} from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+
+import { PendingChangesAware } from '../../guards/pending-changes.guard';
 
 import { AdminArticleApiService } from '../../articles/admin-article-api.service';
 import { AdminArticleDetail } from '../../articles/admin-article-detail';
@@ -28,9 +22,7 @@ import { UpdateArticleRequest } from '../../articles/update-article-request';
 const optionalHttpUrlValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
-  const value = String(
-    control.value ?? '',
-  ).trim();
+  const value = String(control.value ?? '').trim();
 
   if (!value) {
     return null;
@@ -39,13 +31,9 @@ const optionalHttpUrlValidator: ValidatorFn = (
   try {
     const url = new URL(value);
 
-    const allowedProtocol =
-      url.protocol === 'http:'
-      || url.protocol === 'https:';
+    const allowedProtocol = url.protocol === 'http:' || url.protocol === 'https:';
 
-    return allowedProtocol && url.hostname
-      ? null
-      : { absoluteHttpUrl: true };
+    return allowedProtocol && url.hostname ? null : { absoluteHttpUrl: true };
   } catch {
     return { absoluteHttpUrl: true };
   }
@@ -54,136 +42,92 @@ const optionalHttpUrlValidator: ValidatorFn = (
 const coverImagePairValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
-  const imageUrl = String(
-    control.get('coverImageUrl')?.value ?? '',
-  ).trim();
+  const imageUrl = String(control.get('coverImageUrl')?.value ?? '').trim();
 
-  const imageAlt = String(
-    control.get('coverImageAlt')?.value ?? '',
-  ).trim();
+  const imageAlt = String(control.get('coverImageAlt')?.value ?? '').trim();
 
-  const hasImageUrl =
-    imageUrl.length > 0;
+  const hasImageUrl = imageUrl.length > 0;
 
-  const hasImageAlt =
-    imageAlt.length > 0;
+  const hasImageAlt = imageAlt.length > 0;
 
-  return hasImageUrl === hasImageAlt
-    ? null
-    : { coverImagePair: true };
+  return hasImageUrl === hasImageAlt ? null : { coverImagePair: true };
 };
 
 const recommendedAudioValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
-  const title = String(
-    control.get('recommendedAudioTitle')?.value ?? '',
-  ).trim();
+  const title = String(control.get('recommendedAudioTitle')?.value ?? '').trim();
 
-  const author = String(
-    control.get('recommendedAudioAuthor')?.value ?? '',
-  ).trim();
+  const author = String(control.get('recommendedAudioAuthor')?.value ?? '').trim();
 
-  const url = String(
-    control.get('recommendedAudioUrl')?.value ?? '',
-  ).trim();
+  const url = String(control.get('recommendedAudioUrl')?.value ?? '').trim();
 
-  const hasTitle =
-    title.length > 0;
+  const hasTitle = title.length > 0;
 
-  const hasAuthor =
-    author.length > 0;
+  const hasAuthor = author.length > 0;
 
-  const hasUrl =
-    url.length > 0;
+  const hasUrl = url.length > 0;
 
-  const isEmpty =
-    !hasTitle
-    && !hasAuthor
-    && !hasUrl;
+  const isEmpty = !hasTitle && !hasAuthor && !hasUrl;
 
-  const isComplete =
-    hasTitle
-    && hasUrl;
+  const isComplete = hasTitle && hasUrl;
 
-  return isEmpty || isComplete
-    ? null
-    : { recommendedAudio: true };
+  return isEmpty || isComplete ? null : { recommendedAudio: true };
 };
 
 @Component({
   selector: 'app-admin-article-edit-page',
-  imports: [
-    ReactiveFormsModule,
-    RouterLink,
-  ],
-  templateUrl:
-    './admin-article-edit-page.component.html',
-  styleUrl:
-    './admin-article-edit-page.component.scss',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './admin-article-edit-page.component.html',
+  styleUrl: './admin-article-edit-page.component.scss',
 })
-export class AdminArticleEditPage implements OnInit {
-  private readonly route =
-    inject(ActivatedRoute);
+export class AdminArticleEditPage implements OnInit, PendingChangesAware {
+  private readonly route = inject(ActivatedRoute);
 
-  private readonly adminArticleApiService =
-    inject(AdminArticleApiService);
+  private readonly adminArticleApiService = inject(AdminArticleApiService);
 
   private articleId: number | null = null;
 
-  protected readonly article =
-    signal<AdminArticleDetail | null>(null);
+  protected readonly article = signal<AdminArticleDetail | null>(null);
 
-  protected readonly isLoading =
-    signal(true);
+  protected readonly isLoading = signal(true);
 
-  protected readonly notFound =
-    signal(false);
+  protected readonly notFound = signal(false);
 
-  protected readonly loadError =
-    signal(false);
+  protected readonly loadError = signal(false);
 
-  protected readonly isSaving =
-    signal(false);
+  protected readonly isSaving = signal(false);
 
-  protected readonly saveError =
-    signal(false);
+  protected readonly saveError = signal(false);
 
-  protected readonly saveSuccess =
-    signal(false);
+  protected readonly saveSuccess = signal(false);
 
-  protected readonly statusAction =
-    signal<'PUBLISH' | 'WITHDRAW' | null>(null);
+  protected readonly statusAction = signal<'PUBLISH' | 'WITHDRAW' | null>(null);
 
-  protected readonly statusChangeError =
-    signal(false);
+  protected readonly statusChangeError = signal(false);
 
-  protected readonly statusChangeMessage =
-    signal<string | null>(null);
+  protected readonly statusChangeMessage = signal<string | null>(null);
 
-  protected readonly statusLabels:
-    Record<ArticleStatus, string> = {
-      DRAFT: 'Borrador',
-      PUBLISHED: 'Publicado',
-      WITHDRAWN: 'Retirado',
-    };
+  protected readonly statusLabels: Record<ArticleStatus, string> = {
+    DRAFT: 'Borrador',
+    PUBLISHED: 'Publicado',
+    WITHDRAWN: 'Retirado',
+  };
+
+  public hasPendingChanges(): boolean {
+    return this.form.dirty;
+  }
 
   protected readonly form = new FormGroup(
     {
       title: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.required,
-          Validators.pattern(/\S/),
-          Validators.maxLength(255),
-        ],
+        validators: [Validators.required, Validators.pattern(/\S/), Validators.maxLength(255)],
       }),
 
       pretitle: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.maxLength(255),
-        ],
+        validators: [Validators.maxLength(255)],
       }),
 
       excerpt: new FormControl('', {
@@ -196,49 +140,31 @@ export class AdminArticleEditPage implements OnInit {
 
       coverImageUrl: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.maxLength(2048),
-          optionalHttpUrlValidator,
-        ],
+        validators: [Validators.maxLength(2048), optionalHttpUrlValidator],
       }),
 
       coverImageAlt: new FormControl('', {
         nonNullable: true,
-        validators: [
-          Validators.maxLength(500),
-        ],
+        validators: [Validators.maxLength(500)],
       }),
 
-      recommendedAudioTitle:
-        new FormControl('', {
-          nonNullable: true,
-          validators: [
-            Validators.maxLength(255),
-          ],
-        }),
+      recommendedAudioTitle: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(255)],
+      }),
 
-      recommendedAudioAuthor:
-        new FormControl('', {
-          nonNullable: true,
-          validators: [
-            Validators.maxLength(255),
-          ],
-        }),
+      recommendedAudioAuthor: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(255)],
+      }),
 
-      recommendedAudioUrl:
-        new FormControl('', {
-          nonNullable: true,
-          validators: [
-            Validators.maxLength(2048),
-            optionalHttpUrlValidator,
-          ],
-        }),
+      recommendedAudioUrl: new FormControl('', {
+        nonNullable: true,
+        validators: [Validators.maxLength(2048), optionalHttpUrlValidator],
+      }),
     },
     {
-      validators: [
-        coverImagePairValidator,
-        recommendedAudioValidator,
-      ],
+      validators: [coverImagePairValidator, recommendedAudioValidator],
     },
   );
 
@@ -267,34 +193,27 @@ export class AdminArticleEditPage implements OnInit {
   }
 
   protected get recommendedAudioTitleControl() {
-    return this.form.controls
-      .recommendedAudioTitle;
+    return this.form.controls.recommendedAudioTitle;
   }
 
   protected get recommendedAudioAuthorControl() {
-    return this.form.controls
-      .recommendedAudioAuthor;
+    return this.form.controls.recommendedAudioAuthor;
   }
 
   protected get recommendedAudioUrlControl() {
-    return this.form.controls
-      .recommendedAudioUrl;
+    return this.form.controls.recommendedAudioUrl;
   }
 
-  protected get coverImagePreviewUrl():
-    string | null {
+  protected get coverImagePreviewUrl(): string | null {
+    const imageUrl = this.coverImageUrlControl.value.trim();
 
-    const imageUrl =
-      this.coverImageUrlControl.value.trim();
-
-    const imageAlt =
-      this.coverImageAltControl.value.trim();
+    const imageAlt = this.coverImageAltControl.value.trim();
 
     if (
-      !imageUrl
-      || !imageAlt
-      || this.coverImageUrlControl.invalid
-      || this.coverImageAltControl.invalid
+      !imageUrl ||
+      !imageAlt ||
+      this.coverImageUrlControl.invalid ||
+      this.coverImageAltControl.invalid
     ) {
       return null;
     }
@@ -303,17 +222,11 @@ export class AdminArticleEditPage implements OnInit {
   }
 
   ngOnInit(): void {
-    const idParameter =
-      this.route.snapshot.paramMap.get('id');
+    const idParameter = this.route.snapshot.paramMap.get('id');
 
-    const parsedId =
-      Number(idParameter);
+    const parsedId = Number(idParameter);
 
-    if (
-      idParameter === null
-      || !Number.isInteger(parsedId)
-      || parsedId <= 0
-    ) {
+    if (idParameter === null || !Number.isInteger(parsedId) || parsedId <= 0) {
       this.notFound.set(true);
       this.isLoading.set(false);
       return;
@@ -333,59 +246,46 @@ export class AdminArticleEditPage implements OnInit {
     this.notFound.set(false);
     this.loadError.set(false);
 
-    this.adminArticleApiService
-      .getArticleById(this.articleId)
-      .subscribe({
-        next: (article) => {
-          this.article.set(article);
+    this.adminArticleApiService.getArticleById(this.articleId).subscribe({
+      next: (article) => {
+        this.article.set(article);
 
-          this.fillForm(article);
+        this.fillForm(article);
 
-          this.isLoading.set(false);
-        },
+        this.isLoading.set(false);
+      },
 
-        error: (error) => {
-          if (error.status === 404) {
-            this.notFound.set(true);
-          } else {
-            this.loadError.set(true);
-          }
+      error: (error) => {
+        if (error.status === 404) {
+          this.notFound.set(true);
+        } else {
+          this.loadError.set(true);
+        }
 
-          this.isLoading.set(false);
-        },
-      });
+        this.isLoading.set(false);
+      },
+    });
   }
 
-  private fillForm(
-    article: AdminArticleDetail,
-  ): void {
+  private fillForm(article: AdminArticleDetail): void {
     this.form.setValue({
-      title:
-        article.title,
+      title: article.title,
 
-      pretitle:
-        article.pretitle ?? '',
+      pretitle: article.pretitle ?? '',
 
-      excerpt:
-        article.excerpt ?? '',
+      excerpt: article.excerpt ?? '',
 
-      body:
-        article.body ?? '',
+      body: article.body ?? '',
 
-      coverImageUrl:
-        article.coverImageUrl ?? '',
+      coverImageUrl: article.coverImageUrl ?? '',
 
-      coverImageAlt:
-        article.coverImageAlt ?? '',
+      coverImageAlt: article.coverImageAlt ?? '',
 
-      recommendedAudioTitle:
-        article.recommendedAudioTitle ?? '',
+      recommendedAudioTitle: article.recommendedAudioTitle ?? '',
 
-      recommendedAudioAuthor:
-        article.recommendedAudioAuthor ?? '',
+      recommendedAudioAuthor: article.recommendedAudioAuthor ?? '',
 
-      recommendedAudioUrl:
-        article.recommendedAudioUrl ?? '',
+      recommendedAudioUrl: article.recommendedAudioUrl ?? '',
     });
 
     this.form.markAsPristine();
@@ -397,10 +297,7 @@ export class AdminArticleEditPage implements OnInit {
       return;
     }
 
-    if (
-      this.articleId === null
-      || this.isSaving()
-    ) {
+    if (this.articleId === null || this.isSaving()) {
       return;
     }
 
@@ -412,95 +309,58 @@ export class AdminArticleEditPage implements OnInit {
     this.statusChangeMessage.set(null);
 
     const request: UpdateArticleRequest = {
-      title:
-        this.titleControl.value.trim(),
+      title: this.titleControl.value.trim(),
 
-      pretitle:
-        this.normalizeOptionalText(
-          this.pretitleControl.value,
-        ),
+      pretitle: this.normalizeOptionalText(this.pretitleControl.value),
 
-      excerpt:
-        this.normalizeOptionalText(
-          this.excerptControl.value,
-        ),
+      excerpt: this.normalizeOptionalText(this.excerptControl.value),
 
-      body:
-        this.normalizeOptionalText(
-          this.bodyControl.value,
-        ),
+      body: this.normalizeOptionalText(this.bodyControl.value),
 
-      coverImageUrl:
-        this.normalizeOptionalText(
-          this.coverImageUrlControl.value,
-        ),
+      coverImageUrl: this.normalizeOptionalText(this.coverImageUrlControl.value),
 
-      coverImageAlt:
-        this.normalizeOptionalText(
-          this.coverImageAltControl.value,
-        ),
+      coverImageAlt: this.normalizeOptionalText(this.coverImageAltControl.value),
 
-      recommendedAudioTitle:
-        this.normalizeOptionalText(
-          this.recommendedAudioTitleControl.value,
-        ),
+      recommendedAudioTitle: this.normalizeOptionalText(this.recommendedAudioTitleControl.value),
 
-      recommendedAudioAuthor:
-        this.normalizeOptionalText(
-          this.recommendedAudioAuthorControl.value,
-        ),
+      recommendedAudioAuthor: this.normalizeOptionalText(this.recommendedAudioAuthorControl.value),
 
-      recommendedAudioUrl:
-        this.normalizeOptionalText(
-          this.recommendedAudioUrlControl.value,
-        ),
+      recommendedAudioUrl: this.normalizeOptionalText(this.recommendedAudioUrlControl.value),
     };
 
-    this.adminArticleApiService
-      .updateArticle(
-        this.articleId,
-        request,
-      )
-      .subscribe({
-        next: (updatedArticle) => {
-          this.article.set(updatedArticle);
+    this.adminArticleApiService.updateArticle(this.articleId, request).subscribe({
+      next: (updatedArticle) => {
+        this.article.set(updatedArticle);
 
-          this.fillForm(updatedArticle);
+        this.fillForm(updatedArticle);
 
-          this.isSaving.set(false);
-          this.saveSuccess.set(true);
-        },
+        this.isSaving.set(false);
+        this.saveSuccess.set(true);
+      },
 
-        error: (error) => {
-          console.error(
-            'Could not update article',
-            error,
-          );
+      error: (error) => {
+        console.error('Could not update article', error);
 
-          this.isSaving.set(false);
-          this.saveError.set(true);
-        },
-      });
+        this.isSaving.set(false);
+        this.saveError.set(true);
+      },
+    });
   }
 
   protected publishArticle(): void {
-    const currentArticle =
-      this.article();
+    const currentArticle = this.article();
 
     if (
-      this.articleId === null
-      || currentArticle === null
-      || this.form.dirty
-      || this.isSaving()
-      || this.statusAction() !== null
+      this.articleId === null ||
+      currentArticle === null ||
+      this.form.dirty ||
+      this.isSaving() ||
+      this.statusAction() !== null
     ) {
       return;
     }
 
-    if (
-      currentArticle.status !== 'DRAFT'
-      && currentArticle.status !== 'WITHDRAWN'
-    ) {
+    if (currentArticle.status !== 'DRAFT' && currentArticle.status !== 'WITHDRAWN') {
       return;
     }
 
@@ -513,44 +373,36 @@ export class AdminArticleEditPage implements OnInit {
     this.statusChangeMessage.set(null);
     this.saveSuccess.set(false);
 
-    this.adminArticleApiService
-      .publishArticle(this.articleId)
-      .subscribe({
-        next: (publishedArticle) => {
-          this.article.set(publishedArticle);
+    this.adminArticleApiService.publishArticle(this.articleId).subscribe({
+      next: (publishedArticle) => {
+        this.article.set(publishedArticle);
 
-          this.fillForm(publishedArticle);
+        this.fillForm(publishedArticle);
 
-          this.statusAction.set(null);
+        this.statusAction.set(null);
 
-          this.statusChangeMessage.set(
-            'Artículo publicado correctamente.',
-          );
-        },
+        this.statusChangeMessage.set('Artículo publicado correctamente.');
+      },
 
-        error: (error) => {
-          console.error(
-            'Could not publish article',
-            error,
-          );
+      error: (error) => {
+        console.error('Could not publish article', error);
 
-          this.statusAction.set(null);
-          this.statusChangeError.set(true);
-        },
-      });
+        this.statusAction.set(null);
+        this.statusChangeError.set(true);
+      },
+    });
   }
 
   protected withdrawArticle(): void {
-    const currentArticle =
-      this.article();
+    const currentArticle = this.article();
 
     if (
-      this.articleId === null
-      || currentArticle === null
-      || currentArticle.status !== 'PUBLISHED'
-      || this.form.dirty
-      || this.isSaving()
-      || this.statusAction() !== null
+      this.articleId === null ||
+      currentArticle === null ||
+      currentArticle.status !== 'PUBLISHED' ||
+      this.form.dirty ||
+      this.isSaving() ||
+      this.statusAction() !== null
     ) {
       return;
     }
@@ -560,45 +412,33 @@ export class AdminArticleEditPage implements OnInit {
     this.statusChangeMessage.set(null);
     this.saveSuccess.set(false);
 
-    this.adminArticleApiService
-      .withdrawArticle(this.articleId)
-      .subscribe({
-        next: (withdrawnArticle) => {
-          this.article.set(withdrawnArticle);
+    this.adminArticleApiService.withdrawArticle(this.articleId).subscribe({
+      next: (withdrawnArticle) => {
+        this.article.set(withdrawnArticle);
 
-          this.fillForm(withdrawnArticle);
+        this.fillForm(withdrawnArticle);
 
-          this.statusAction.set(null);
+        this.statusAction.set(null);
 
-          this.statusChangeMessage.set(
-            'Artículo retirado correctamente.',
-          );
-        },
+        this.statusChangeMessage.set('Artículo retirado correctamente.');
+      },
 
-        error: (error) => {
-          console.error(
-            'Could not withdraw article',
-            error,
-          );
+      error: (error) => {
+        console.error('Could not withdraw article', error);
 
-          this.statusAction.set(null);
-          this.statusChangeError.set(true);
-        },
-      });
+        this.statusAction.set(null);
+        this.statusChangeError.set(true);
+      },
+    });
   }
 
   protected reloadArticle(): void {
     this.loadArticle();
   }
 
-  private normalizeOptionalText(
-    value: string,
-  ): string | null {
-    const normalizedValue =
-      value.trim();
+  private normalizeOptionalText(value: string): string | null {
+    const normalizedValue = value.trim();
 
-    return normalizedValue.length === 0
-      ? null
-      : normalizedValue;
+    return normalizedValue.length === 0 ? null : normalizedValue;
   }
 }
