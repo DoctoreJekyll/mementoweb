@@ -61,10 +61,6 @@ export class ArticleMarkdownService {
         continue;
       }
 
-      /*
-       * Los enlaces internos que empiezan por "/"
-       * permanecen en la pestaña actual.
-       */
       if (href.startsWith('/')) {
         link.removeAttribute('target');
         link.removeAttribute('rel');
@@ -81,11 +77,6 @@ export class ArticleMarkdownService {
           continue;
         }
 
-        /*
-         * Los enlaces externos se abren en una
-         * pestaña independiente sin dar acceso
-         * a la ventana original.
-         */
         link.setAttribute('target', '_blank');
 
         link.setAttribute('rel', 'noopener noreferrer');
