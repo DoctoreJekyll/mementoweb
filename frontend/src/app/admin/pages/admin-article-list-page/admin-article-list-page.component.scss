@@ -227,3 +227,39 @@
 .admin-article h2 a:hover {
   color: var(--color-accent);
 }
+
+.article-pagination {
+  display: flex;
+  padding-block: 2rem;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.article-pagination p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+}
+
+.article-pagination button {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.article-pagination button:hover:not(:disabled) {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.article-pagination button:disabled {
+  border-color: var(--color-line);
+  color: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.55;
+}

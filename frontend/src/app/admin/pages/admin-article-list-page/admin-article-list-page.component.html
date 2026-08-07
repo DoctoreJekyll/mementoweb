@@ -1,9 +1,7 @@
 <section class="admin-page">
   <header class="admin-page__header">
     <div>
-      <p class="admin-page__eyebrow">
-        Administración
-      </p>
+      <p class="admin-page__eyebrow">Administración</p>
 
       <h1>Artículos</h1>
 
@@ -13,29 +11,19 @@
     </div>
 
     <div class="admin-page__actions">
-      <a
-        class="admin-page__create-link"
-        routerLink="/admin/articulos/nuevo">
-        Nuevo artículo
-      </a>
+      <a class="admin-page__create-link" routerLink="/admin/articulos/nuevo"> Nuevo artículo </a>
 
-      <a
-        class="admin-page__public-link"
-        routerLink="/">
-        ← Ver web pública
-      </a>
+      <a class="admin-page__public-link" routerLink="/"> ← Ver web pública </a>
     </div>
   </header>
 
-  <nav
-    class="article-filters"
-    aria-label="Filtrar artículos por estado">
-
+  <nav class="article-filters" aria-label="Filtrar artículos por estado">
     <button
       type="button"
       [class.is-active]="selectedStatus() === null"
       [attr.aria-pressed]="selectedStatus() === null"
-      (click)="filterByStatus(null)">
+      (click)="filterByStatus(null)"
+    >
       Todos
     </button>
 
@@ -43,7 +31,8 @@
       type="button"
       [class.is-active]="selectedStatus() === 'DRAFT'"
       [attr.aria-pressed]="selectedStatus() === 'DRAFT'"
-      (click)="filterByStatus('DRAFT')">
+      (click)="filterByStatus('DRAFT')"
+    >
       Borradores
     </button>
 
@@ -51,7 +40,8 @@
       type="button"
       [class.is-active]="selectedStatus() === 'PUBLISHED'"
       [attr.aria-pressed]="selectedStatus() === 'PUBLISHED'"
-      (click)="filterByStatus('PUBLISHED')">
+      (click)="filterByStatus('PUBLISHED')"
+    >
       Publicados
     </button>
 
@@ -59,44 +49,29 @@
       type="button"
       [class.is-active]="selectedStatus() === 'WITHDRAWN'"
       [attr.aria-pressed]="selectedStatus() === 'WITHDRAWN'"
-      (click)="filterByStatus('WITHDRAWN')">
+      (click)="filterByStatus('WITHDRAWN')"
+    >
       Retirados
     </button>
   </nav>
 
   @if (isLoading()) {
-    <div
-      class="admin-state"
-      aria-live="polite">
+    <div class="admin-state" aria-live="polite">
       <p>Cargando artículos…</p>
     </div>
   } @else if (loadError()) {
-    <div
-      class="admin-state admin-state--error"
-      role="alert">
-
+    <div class="admin-state admin-state--error" role="alert">
       <h2>No hemos podido cargar los artículos</h2>
 
-      <p>
-        Comprueba que Spring y PostgreSQL están levantados.
-      </p>
+      <p>Comprueba que Spring y PostgreSQL están levantados.</p>
 
-      <button
-        type="button"
-        (click)="reloadArticles()">
-        Volver a intentarlo
-      </button>
+      <button type="button" (click)="reloadArticles()">Volver a intentarlo</button>
     </div>
   } @else {
-    <p class="article-results">
-      Artículos encontrados: {{ totalElements() }}
-    </p>
+    <p class="article-results">Artículos encontrados: {{ totalElements() }}</p>
 
     <div class="admin-article-list">
-      @for (
-        article of articles();
-        track article.id
-      ) {
+      @for (article of articles(); track article.id) {
         <article class="admin-article">
           <div class="admin-article__heading">
             @if (article.pretitle) {
@@ -106,47 +81,30 @@
             }
 
             <h2>
-              <a
-                [routerLink]="[
-                  '/admin/articulos',
-                  article.id,
-                  'editar'
-                ]">
+              <a [routerLink]="['/admin/articulos', article.id, 'editar']">
                 {{ article.title }}
               </a>
             </h2>
 
-            <p class="admin-article__id">
-              ID {{ article.id }}
-            </p>
+            <p class="admin-article__id">ID {{ article.id }}</p>
           </div>
 
           <div class="admin-article__state">
-            <span
-              class="article-status"
-              [attr.data-status]="article.status">
+            <span class="article-status" [attr.data-status]="article.status">
               {{ statusLabels[article.status] }}
             </span>
 
             @if (article.status !== 'PUBLISHED') {
               <span class="publication-readiness">
-                {{
-                  article.canBePublished
-                    ? 'Listo para publicar'
-                    : 'Contenido incompleto'
-                }}
+                {{ article.canBePublished ? 'Listo para publicar' : 'Contenido incompleto' }}
               </span>
             }
           </div>
 
           <div class="admin-article__publication">
             @if (article.publishedAt) {
-              <time
-                [attr.datetime]="article.publishedAt">
-                {{
-                  article.publishedAt
-                    | date:'dd/MM/yyyy'
-                }}
+              <time [attr.datetime]="article.publishedAt">
+                {{ article.publishedAt | date: 'dd/MM/yyyy' }}
               </time>
             } @else {
               <span>Sin publicar</span>
@@ -160,11 +118,28 @@
       } @empty {
         <div class="admin-state">
           <h2>No hay artículos en este estado</h2>
-          <p>
-            Prueba con otro filtro o crea un artículo nuevo.
-          </p>
+
+          <p>Prueba con otro filtro o crea un artículo nuevo.</p>
         </div>
       }
     </div>
+
+    @if (totalPages() > 1) {
+      <nav class="article-pagination" aria-label="Paginación de artículos">
+        <button type="button" [disabled]="currentPage() === 0" (click)="goToPreviousPage()">
+          ← Anterior
+        </button>
+
+        <p aria-live="polite">Página {{ currentPage() + 1 }} de {{ totalPages() }}</p>
+
+        <button
+          type="button"
+          [disabled]="currentPage() >= totalPages() - 1"
+          (click)="goToNextPage()"
+        >
+          Siguiente →
+        </button>
+      </nav>
+    }
   }
 </section>
