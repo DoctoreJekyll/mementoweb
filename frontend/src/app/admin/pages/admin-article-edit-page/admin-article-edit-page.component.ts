@@ -78,6 +78,9 @@ const recommendedAudioValidator: ValidatorFn = (
 @Component({
   selector: 'app-admin-article-edit-page',
   imports: [ReactiveFormsModule, RouterLink],
+  host: {
+    '(window:beforeunload)': 'onBeforeUnload($event)',
+  },
   templateUrl: './admin-article-edit-page.component.html',
   styleUrl: './admin-article-edit-page.component.scss',
 })
@@ -116,6 +119,15 @@ export class AdminArticleEditPage implements OnInit, PendingChangesAware {
 
   public hasPendingChanges(): boolean {
     return this.form.dirty;
+  }
+
+  public onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasPendingChanges()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.returnValue = true;
   }
 
   protected readonly form = new FormGroup(
