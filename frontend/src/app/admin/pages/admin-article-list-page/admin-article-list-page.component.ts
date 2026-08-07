@@ -29,7 +29,7 @@ export class AdminArticleListPage implements OnInit {
     WITHDRAWN: 'Retirado',
   };
 
-  private readonly pageSize = 10;
+  private readonly pageSize = 5;
 
   protected readonly currentPage = signal(0);
 
