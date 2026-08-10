@@ -1,11 +1,12 @@
 package com.jose.mementoweb.config;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,31 +18,40 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import org.springframework.context.annotation.Import;
 
-
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class SecurityIntegrationTest {
 
-        private static final String ADMIN_USERNAME = "test-admin";
-
-        private static final String ADMIN_PASSWORD = "test-password";
-
         @Autowired
         private MockMvc mockMvc;
 
         @Test
-        void shouldReturnAuthenticatedAdminSession()
+        void shouldRejectAnonymousWritesToPublicArticles()
                         throws Exception {
 
-                mockMvc.perform(get("/api/admin/session")
-                                .with(httpBasic(
-                                                ADMIN_USERNAME,
-                                                ADMIN_PASSWORD)))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.username")
-                                                .value(ADMIN_USERNAME));
+                mockMvc.perform(post("/api/articles")
+                                .with(csrf()))
+                                .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void shouldRejectAdminAccessToUnknownApiEndpoint()
+                        throws Exception {
+
+                mockMvc.perform(get("/api/unknown")
+                                .with(user("admin")
+                                                .roles("ADMIN")))
+                                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void shouldRejectAnonymousAccessToUnknownApiEndpoint()
+                        throws Exception {
+
+                mockMvc.perform(get("/api/unknown"))
+                                .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -64,20 +74,6 @@ class SecurityIntegrationTest {
         }
 
         @Test
-        void shouldRejectInvalidAdminCredentials()
-                        throws Exception {
-
-                mockMvc.perform(get("/api/admin/articles")
-                                .with(httpBasic(
-                                                ADMIN_USERNAME,
-                                                "incorrect-password")))
-                                .andExpect(status().isUnauthorized())
-                                .andExpect(
-                                                header().doesNotExist(
-                                                                HttpHeaders.WWW_AUTHENTICATE));
-        }
-
-        @Test
         void shouldRejectAuthenticatedUserWithoutAdminRole()
                         throws Exception {
 
@@ -88,13 +84,12 @@ class SecurityIntegrationTest {
         }
 
         @Test
-        void shouldAllowValidAdminCredentials()
+        void shouldAllowAdminAccessToAdminArticles()
                         throws Exception {
 
                 mockMvc.perform(get("/api/admin/articles")
-                                .with(httpBasic(
-                                                ADMIN_USERNAME,
-                                                ADMIN_PASSWORD)))
+                                .with(user("admin")
+                                                .roles("ADMIN")))
                                 .andExpect(status().isOk());
         }
 }
