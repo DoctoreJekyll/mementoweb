@@ -1,11 +1,26 @@
 <header class="site-header">
   <div class="site-header__content">
     <p class="site-header__name">Memento vivere</p>
-    <p class="site-header__description">
-      Videojuegos, cultura y memoria
-    </p>
+    <p class="site-header__description">Videojuegos, cultura y memoria</p>
   </div>
 </header>
+
+@if (errorRequestId(); as requestId) {
+  <aside class="api-error-notice" role="alert" aria-labelledby="api-error-notice-title">
+    <div class="api-error-notice__content">
+      <div>
+        <p id="api-error-notice-title" class="api-error-notice__title">Incidencia técnica</p>
+
+        <p class="api-error-notice__description">
+          Se ha producido un error inesperado. Si vuelve a ocurrir, conserva esta referencia:
+          <code>{{ requestId }}</code>
+        </p>
+      </div>
+
+      <button type="button" (click)="dismissApiError()">Cerrar</button>
+    </div>
+  </aside>
+}
 
 <main>
   <router-outlet />
@@ -15,8 +30,6 @@
   <div class="site-footer__content">
     <p>Memento vivere</p>
 
-    <a routerLink="/admin/articulos">
-      Área editorial
-    </a>
+    <a routerLink="/admin/articulos"> Área editorial </a>
   </div>
 </footer>
