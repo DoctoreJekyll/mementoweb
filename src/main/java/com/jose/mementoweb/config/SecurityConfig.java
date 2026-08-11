@@ -14,6 +14,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
@@ -36,7 +37,8 @@ public class SecurityConfig {
                         + "media-src 'none'";
 
         @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        SecurityFilterChain securityFilterChain(HttpSecurity http, LoginAttemptService loginAttemptService)
+                        throws Exception {
                 http.authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers(
                                                 HttpMethod.GET,
@@ -126,6 +128,11 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(
                                                 new HttpStatusEntryPoint(
                                                                 HttpStatus.UNAUTHORIZED)));
+
+                http.addFilterBefore(
+                                new LoginRateLimitFilter(
+                                                loginAttemptService),
+                                UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
