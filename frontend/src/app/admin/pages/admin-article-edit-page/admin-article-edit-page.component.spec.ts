@@ -51,7 +51,12 @@ describe('AdminArticleEditPage', () => {
     status: 'DRAFT',
     canBePublished: true,
     slug: null,
-    publishedAt: null
+    publishedAt: null,
+    coverImageUrl: null,
+    coverImageAlt: null,
+    recommendedAudioTitle: null,
+    recommendedAudioAuthor: null,
+    recommendedAudioUrl: null
   };
 
   const updatedArticle: AdminArticleDetail = {
