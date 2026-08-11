@@ -5,7 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import jakarta.servlet.http.Cookie;
 
 import org.springframework.context.annotation.Import;
 
@@ -32,7 +36,7 @@ class SecurityIntegrationTest {
                         throws Exception {
 
                 mockMvc.perform(post("/api/articles")
-                                .with(csrf()))
+                                .with(spaCsrf()))
                                 .andExpect(status().isUnauthorized());
         }
 
@@ -91,5 +95,22 @@ class SecurityIntegrationTest {
                                 .with(user("admin")
                                                 .roles("ADMIN")))
                                 .andExpect(status().isOk());
+        }
+
+        private RequestPostProcessor spaCsrf() {
+                return request -> {
+                        String token = UUID.randomUUID().toString();
+
+                        request.setCookies(
+                                        new Cookie(
+                                                        "XSRF-TOKEN",
+                                                        token));
+
+                        request.addHeader(
+                                        "X-XSRF-TOKEN",
+                                        token);
+
+                        return request;
+                };
         }
 }

@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -84,12 +83,7 @@ public class SecurityConfig {
                                                                 "camera=(), "
                                                                                 + "microphone=(), "
                                                                                 + "geolocation=()")));
-
-                http.csrf(csrf -> csrf
-                                .spa()
-                                .csrfTokenRepository(
-                                                CookieCsrfTokenRepository
-                                                                .withHttpOnlyFalse()));
+                http.csrf(csrf -> csrf.spa());
 
                 http.formLogin(form -> form
                                 .loginProcessingUrl("/api/admin/login")
