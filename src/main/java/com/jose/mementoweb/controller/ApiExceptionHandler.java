@@ -9,8 +9,14 @@ import com.jose.mementoweb.exception.ArticleNotFoundException;
 import com.jose.mementoweb.exception.ArticleStateException;
 import com.jose.mementoweb.exception.PublishedArticleNotFoundException;
 
+import org.slf4j.MDC;
+
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final String REQUEST_ID_MDC_KEY = "requestId";
+
+    private static final String REQUEST_ID_PROPERTY = "requestId";
 
     @ExceptionHandler(ArticleNotFoundException.class)
     public ProblemDetail handleArticleNotFound(
@@ -22,6 +28,7 @@ public class ApiExceptionHandler {
 
         problem.setTitle("Article not found");
 
+        addRequestId(problem);
         return problem;
     }
 
@@ -35,6 +42,7 @@ public class ApiExceptionHandler {
 
         problem.setTitle("Invalid article state");
 
+        addRequestId(problem);
         return problem;
     }
 
@@ -48,6 +56,7 @@ public class ApiExceptionHandler {
 
         problem.setTitle("Published article not found");
 
+        addRequestId(problem);
         return problem;
     }
 
@@ -61,6 +70,21 @@ public class ApiExceptionHandler {
 
         problem.setTitle("Invalid request");
 
+        addRequestId(problem);
         return problem;
+    }
+
+    private static void addRequestId(
+            ProblemDetail problem) {
+
+        String requestId = MDC.get(REQUEST_ID_MDC_KEY);
+
+        if (requestId != null
+                && !requestId.isBlank()) {
+
+            problem.setProperty(
+                    REQUEST_ID_PROPERTY,
+                    requestId);
+        }
     }
 }
