@@ -9,14 +9,72 @@ import com.jose.mementoweb.exception.ArticleNotFoundException;
 import com.jose.mementoweb.exception.ArticleStateException;
 import com.jose.mementoweb.exception.PublishedArticleNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
 import org.slf4j.MDC;
 
 @RestControllerAdvice
-public class ApiExceptionHandler {
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final String REQUEST_ID_MDC_KEY = "requestId";
 
     private static final String REQUEST_ID_PROPERTY = "requestId";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            ApiExceptionHandler.class);
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleUnexpectedException(
+            Exception exception) {
+
+        LOGGER.error(
+                "Unexpected error while processing request",
+                exception);
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred.");
+
+        problem.setTitle(
+                "Internal server error");
+
+        addRequestId(problem);
+
+        return problem;
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+            Exception exception,
+            Object body,
+            HttpHeaders headers,
+            HttpStatusCode statusCode,
+            WebRequest request) {
+
+        Object responseBody = body;
+
+        if (responseBody == null) {
+            responseBody = ProblemDetail.forStatus(
+                    statusCode);
+        }
+
+        if (responseBody instanceof ProblemDetail problem) {
+            addRequestId(problem);
+        }
+
+        return super.handleExceptionInternal(
+                exception,
+                responseBody,
+                headers,
+                statusCode,
+                request);
+    }
 
     @ExceptionHandler(ArticleNotFoundException.class)
     public ProblemDetail handleArticleNotFound(
