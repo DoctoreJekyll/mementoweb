@@ -78,7 +78,7 @@ public class SecurityConfig {
                                                 .policy(
                                                                 ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
 
-                                .permissionsPolicy(permissions -> permissions
+                                .permissionsPolicyHeader(permissions -> permissions
                                                 .policy(
                                                                 "camera=(), "
                                                                                 + "microphone=(), "
@@ -143,15 +143,43 @@ public class SecurityConfig {
         }
 
         @Bean
-        UserDetailsService userDetailsService(PasswordEncoder passwordEncoder,
+        UserDetailsService userDetailsService(
+                        PasswordEncoder passwordEncoder,
                         @Value("${app.security.admin.username}") String username,
                         @Value("${app.security.admin.password}") String password) {
 
-                UserDetails admin = User.withUsername(username)
-                                .password(passwordEncoder.encode(password))
+                validateAdminCredentials(
+                                username,
+                                password);
+
+                UserDetails admin = User.withUsername(username.trim())
+                                .password(
+                                                passwordEncoder.encode(
+                                                                password))
                                 .roles("ADMIN")
                                 .build();
 
-                return new InMemoryUserDetailsManager(admin);
+                return new InMemoryUserDetailsManager(
+                                admin);
+        }
+
+        private static void validateAdminCredentials(
+                        String username,
+                        String password) {
+
+                if (username == null
+                                || username.isBlank()) {
+
+                        throw new IllegalStateException(
+                                        "Admin username must be configured");
+                }
+
+                if (password == null
+                                || password.length() < 15) {
+
+                        throw new IllegalStateException(
+                                        "Admin password must contain "
+                                                        + "at least 15 characters");
+                }
         }
 }
