@@ -7,10 +7,12 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { adminAuthInterceptor } from './admin/auth/admin-auth.interceptor';
 
+import { apiErrorReferenceInterceptor } from './core/http/api-error-reference.interceptor';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([adminAuthInterceptor])),
+    provideHttpClient(withInterceptors([apiErrorReferenceInterceptor, adminAuthInterceptor])),
   ],
 };
