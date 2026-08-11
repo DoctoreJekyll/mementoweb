@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions
+    xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.4.xsd https://dependency-check.github.io/DependencyCheck/dependency-suppression.1.4.xsd">
+
+    <suppress until="2026-10-01Z">
+        <notes><![CDATA[
+        CVE-2026-66299 afecta exclusivamente a la aplicación de ejemplo
+        WebSocket Chat de Tomcat. MementoWeb utiliza Tomcat embebido mediante
+        Spring Boot y no distribuye la aplicación web examples.
+        Exclusión temporal hasta poder actualizar a Tomcat 11.0.25.
+    ]]></notes>
+
+        <packageUrl regex="true">
+        ^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-.*@11\.0\.24$
+    </packageUrl>
+
+        <cve>CVE-2026-66299</cve>
+    </suppress>
+
+</suppressions>
