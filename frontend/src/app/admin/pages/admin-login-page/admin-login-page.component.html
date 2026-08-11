@@ -41,6 +41,12 @@
       </div>
     }
 
+    @if (loginError() === 'TOO_MANY_ATTEMPTS') {
+      <div class="login-message login-message--error" role="alert">
+        Se han realizado demasiados intentos. Espera unos minutos antes de volver a intentarlo.
+      </div>
+    }
+
     @if (loginError() === 'SERVER_ERROR') {
       <div class="login-message login-message--error" role="alert">
         No hemos podido conectar con el servidor. Inténtalo de nuevo.

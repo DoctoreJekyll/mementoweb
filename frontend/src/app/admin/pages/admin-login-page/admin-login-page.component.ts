@@ -6,7 +6,7 @@ import { finalize } from 'rxjs';
 
 import { AdminAuthService } from '../../auth/admin-auth.service';
 
-type LoginError = 'INVALID_CREDENTIALS' | 'SERVER_ERROR' | null;
+type LoginError = 'INVALID_CREDENTIALS' | 'TOO_MANY_ATTEMPTS' | 'SERVER_ERROR' | null;
 
 @Component({
   selector: 'app-admin-login-page',
@@ -63,6 +63,12 @@ export class AdminLoginPage {
         error: (error: HttpErrorResponse) => {
           if (error.status === 401) {
             this.loginError.set('INVALID_CREDENTIALS');
+
+            return;
+          }
+
+          if (error.status === 429) {
+            this.loginError.set('TOO_MANY_ATTEMPTS');
 
             return;
           }
