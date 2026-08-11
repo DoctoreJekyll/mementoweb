@@ -16,10 +16,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+        private static final String CONTENT_SECURITY_POLICY = "default-src 'self'; "
+                        + "script-src 'self'; "
+                        + "style-src 'self' 'unsafe-inline'; "
+                        + "img-src 'self' https: data:; "
+                        + "font-src 'self'; "
+                        + "connect-src 'self'; "
+                        + "object-src 'none'; "
+                        + "frame-src 'none'; "
+                        + "frame-ancestors 'none'; "
+                        + "base-uri 'self'; "
+                        + "form-action 'self'; "
+                        + "media-src 'none'";
 
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,6 +64,23 @@ public class SecurityConfig {
                                                 SessionCreationPolicy.IF_REQUIRED)
 
                                 .sessionFixation(fixation -> fixation.changeSessionId()));
+
+                http.headers(headers -> headers
+                                .contentSecurityPolicy(csp -> csp
+                                                .policyDirectives(
+                                                                CONTENT_SECURITY_POLICY)
+
+                                                .reportOnly())
+
+                                .referrerPolicy(referrer -> referrer
+                                                .policy(
+                                                                ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+
+                                .permissionsPolicy(permissions -> permissions
+                                                .policy(
+                                                                "camera=(), "
+                                                                                + "microphone=(), "
+                                                                                + "geolocation=()")));
 
                 http.csrf(csrf -> csrf.spa());
 
