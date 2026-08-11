@@ -9,7 +9,7 @@ Define las credenciales del administrador en esa misma terminal:
 
 ```powershell
 $env:MEMENTO_ADMIN_USERNAME="TU_USUARIO"
-$env:MEMENTO_ADMIN_PASSWORD="UNA_CONTRASEÑA_SEGURA"
+$env:MEMENTO_ADMIN_PASSWORD="UNA_CONTRASEÑA_SEGURA333"
 ```
 
 app completa con docker
