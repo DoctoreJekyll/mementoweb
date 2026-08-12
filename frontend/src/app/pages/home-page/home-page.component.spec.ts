@@ -17,14 +17,18 @@ describe('HomePage', () => {
       title: 'Primer artículo',
       pretitle: 'Ensayo',
       excerpt: 'Entradilla del primer artículo.',
-      publishedAt: '2026-07-29T10:00:00Z'
+      publishedAt: '2026-07-29T10:00:00Z', 
+      coverImageUrl: null,
+      coverImageAlt: null
     },
     {
       slug: 'segundo-articulo-110',
       title: 'Segundo artículo',
       pretitle: 'Reflexión',
       excerpt: 'Entradilla del segundo artículo.',
-      publishedAt: '2026-07-28T10:00:00Z'
+      publishedAt: '2026-07-28T10:00:00Z',
+      coverImageUrl: null,
+      coverImageAlt: null
     }
   ];
 

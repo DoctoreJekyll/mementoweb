@@ -39,7 +39,9 @@ describe('ArticleApiService', () => {
           title: 'Primer artículo',
           pretitle: 'Ensayo',
           excerpt: 'Entradilla del artículo.',
-          publishedAt: '2026-07-29T10:00:00Z'
+          publishedAt: '2026-07-29T10:00:00Z',
+          coverImageUrl: null,
+          coverImageAlt: null
         }
       ],
       page: 2,
@@ -79,7 +81,12 @@ describe('ArticleApiService', () => {
       pretitle: 'Ensayo',
       excerpt: 'Entradilla del artículo.',
       body: 'Cuerpo completo del artículo.',
-      publishedAt: '2026-07-29T10:00:00Z'
+      publishedAt: '2026-07-29T10:00:00Z',
+      coverImageUrl: null,
+      coverImageAlt: null,
+      recommendedAudioTitle: null,
+      recommendedAudioAuthor: null,
+      recommendedAudioUrl: null
     };
 
     let receivedArticle: ArticleDetail | undefined;

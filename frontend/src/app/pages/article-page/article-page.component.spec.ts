@@ -24,7 +24,12 @@ describe('ArticlePage', () => {
     pretitle: 'Ensayo',
     excerpt: 'Entradilla del artículo.',
     body: 'Cuerpo completo del artículo.',
-    publishedAt: '2026-07-29T10:00:00Z'
+    publishedAt: '2026-07-29T10:00:00Z',
+    coverImageUrl: null,
+    coverImageAlt: null,
+    recommendedAudioTitle: null,
+    recommendedAudioAuthor: null,
+    recommendedAudioUrl: null
   };
 
   const articleApiServiceStub = {

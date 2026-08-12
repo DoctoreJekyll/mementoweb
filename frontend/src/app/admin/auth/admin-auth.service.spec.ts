@@ -1,5 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+
 import { TestBed } from '@angular/core/testing';
 
 import { AdminAuthService } from './admin-auth.service';
@@ -10,12 +15,20 @@ describe('AdminAuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AdminAuthService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        AdminAuthService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
 
-    service = TestBed.inject(AdminAuthService);
+    service = TestBed.inject(
+      AdminAuthService,
+    );
 
-    httpTesting = TestBed.inject(HttpTestingController);
+    httpTesting = TestBed.inject(
+      HttpTestingController,
+    );
   });
 
   afterEach(() => {
@@ -26,39 +39,133 @@ describe('AdminAuthService', () => {
     const username = 'test-admin';
     const password = 'test-password';
 
-    const expectedAuthorization = `Basic ${btoa(`${username}:${password}`)}`;
+    service
+      .login(username, password)
+      .subscribe();
 
-    service.login(username, password).subscribe();
+    const initialCsrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
 
-    const request = httpTesting.expectOne('/api/admin/session');
+    expect(
+      initialCsrfRequest.request.method,
+    ).toBe('GET');
 
-    expect(request.request.method).toBe('GET');
+    initialCsrfRequest.flush({
+      token: 'initial-csrf-token',
+    });
 
-    expect(request.request.headers.get('Authorization')).toBe(expectedAuthorization);
+    const loginRequest =
+      httpTesting.expectOne(
+        '/api/admin/login',
+      );
 
-    request.flush({
+    expect(
+      loginRequest.request.method,
+    ).toBe('POST');
+
+    expect(
+      loginRequest.request.body.get(
+        'username',
+      ),
+    ).toBe(username);
+
+    expect(
+      loginRequest.request.body.get(
+        'password',
+      ),
+    ).toBe(password);
+
+    expect(
+      loginRequest.request.headers.has(
+        'Authorization',
+      ),
+    ).toBe(false);
+
+    loginRequest.flush(
+      null,
+      {
+        status: 204,
+        statusText: 'No Content',
+      },
+    );
+
+    const renewedCsrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
+
+    expect(
+      renewedCsrfRequest.request.method,
+    ).toBe('GET');
+
+    renewedCsrfRequest.flush({
+      token: 'renewed-csrf-token',
+    });
+
+    const sessionRequest =
+      httpTesting.expectOne(
+        '/api/admin/session',
+      );
+
+    expect(
+      sessionRequest.request.method,
+    ).toBe('GET');
+
+    expect(
+      sessionRequest.request.headers.has(
+        'Authorization',
+      ),
+    ).toBe(false);
+
+    sessionRequest.flush({
       username,
     });
 
-    expect(service.isAuthenticated()).toBe(true);
+    expect(
+      service.isAuthenticated(),
+    ).toBe(true);
 
-    expect(service.username()).toBe(username);
-
-    expect(service.getAuthorizationHeader()).toBe(expectedAuthorization);
+    expect(
+      service.username(),
+    ).toBe(username);
   });
 
   it('should remain logged out when credentials are invalid', () => {
-    let receivedStatus: number | undefined;
+    let receivedStatus:
+      number | undefined;
 
-    service.login('test-admin', 'incorrect-password').subscribe({
-      error: (error) => {
-        receivedStatus = error.status;
-      },
+    service
+      .login(
+        'test-admin',
+        'incorrect-password',
+      )
+      .subscribe({
+        error: (error) => {
+          receivedStatus = error.status;
+        },
+      });
+
+    const csrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
+
+    csrfRequest.flush({
+      token: 'csrf-token',
     });
 
-    const request = httpTesting.expectOne('/api/admin/session');
+    const loginRequest =
+      httpTesting.expectOne(
+        '/api/admin/login',
+      );
 
-    request.flush(
+    expect(
+      loginRequest.request.method,
+    ).toBe('POST');
+
+    loginRequest.flush(
       {
         title: 'Unauthorized',
         status: 401,
@@ -71,30 +178,105 @@ describe('AdminAuthService', () => {
 
     expect(receivedStatus).toBe(401);
 
-    expect(service.isAuthenticated()).toBe(false);
+    expect(
+      service.isAuthenticated(),
+    ).toBe(false);
 
-    expect(service.username()).toBeNull();
-
-    expect(service.getAuthorizationHeader()).toBeNull();
+    expect(
+      service.username(),
+    ).toBeNull();
   });
 
   it('should clear authentication on logout', () => {
-    service.login('test-admin', 'test-password').subscribe();
+    const username = 'test-admin';
 
-    const request = httpTesting.expectOne('/api/admin/session');
+    service
+      .login(
+        username,
+        'test-password',
+      )
+      .subscribe();
 
-    request.flush({
-      username: 'test-admin',
+    const initialCsrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
+
+    initialCsrfRequest.flush({
+      token: 'initial-csrf-token',
     });
 
-    expect(service.isAuthenticated()).toBe(true);
+    const loginRequest =
+      httpTesting.expectOne(
+        '/api/admin/login',
+      );
 
-    service.logout();
+    loginRequest.flush(
+      null,
+      {
+        status: 204,
+        statusText: 'No Content',
+      },
+    );
 
-    expect(service.isAuthenticated()).toBe(false);
+    const renewedLoginCsrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
 
-    expect(service.username()).toBeNull();
+    renewedLoginCsrfRequest.flush({
+      token: 'login-csrf-token',
+    });
 
-    expect(service.getAuthorizationHeader()).toBeNull();
+    const sessionRequest =
+      httpTesting.expectOne(
+        '/api/admin/session',
+      );
+
+    sessionRequest.flush({
+      username,
+    });
+
+    expect(
+      service.isAuthenticated(),
+    ).toBe(true);
+
+    service
+      .logout()
+      .subscribe();
+
+    const logoutRequest =
+      httpTesting.expectOne(
+        '/api/admin/logout',
+      );
+
+    expect(
+      logoutRequest.request.method,
+    ).toBe('POST');
+
+    logoutRequest.flush(
+      null,
+      {
+        status: 204,
+        statusText: 'No Content',
+      },
+    );
+
+    const logoutCsrfRequest =
+      httpTesting.expectOne(
+        '/api/auth/csrf',
+      );
+
+    logoutCsrfRequest.flush({
+      token: 'logout-csrf-token',
+    });
+
+    expect(
+      service.isAuthenticated(),
+    ).toBe(false);
+
+    expect(
+      service.username(),
+    ).toBeNull();
   });
 });
