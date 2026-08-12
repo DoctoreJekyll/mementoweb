@@ -1,10 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+
+import { Component, inject, signal, type OnInit } from '@angular/core';
+
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 import { finalize } from 'rxjs';
 
 import { AdminAuthService } from '../../auth/admin-auth.service';
+import { SeoService } from '../../../core/seo.service';
 
 type LoginError = 'INVALID_CREDENTIALS' | 'TOO_MANY_ATTEMPTS' | 'SERVER_ERROR' | null;
 
@@ -14,12 +19,14 @@ type LoginError = 'INVALID_CREDENTIALS' | 'TOO_MANY_ATTEMPTS' | 'SERVER_ERROR' |
   templateUrl: './admin-login-page.component.html',
   styleUrl: './admin-login-page.component.scss',
 })
-export class AdminLoginPage {
+export class AdminLoginPage implements OnInit {
   private readonly adminAuthService = inject(AdminAuthService);
 
   private readonly router = inject(Router);
 
   private readonly route = inject(ActivatedRoute);
+
+  private readonly seoService = inject(SeoService);
 
   protected readonly isSubmitting = signal(false);
 
@@ -37,9 +44,14 @@ export class AdminLoginPage {
     }),
   });
 
+  ngOnInit(): void {
+    this.seoService.setAdminPage();
+  }
+
   protected login(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+
       return;
     }
 

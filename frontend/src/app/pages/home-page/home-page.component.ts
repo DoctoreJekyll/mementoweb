@@ -5,6 +5,8 @@ import { ArticleApiService } from '../../articles/article-api.service';
 import { ArticleSummary } from '../../articles/article-summary';
 import { RouterLink } from '@angular/router';
 
+import { SeoService } from '../../core/seo.service';
+
 @Component({
   selector: 'app-home-page',
   imports: [DatePipe, RouterLink],
@@ -12,6 +14,8 @@ import { RouterLink } from '@angular/router';
   styleUrl: './home-page.component.scss',
 })
 export class HomePage implements OnInit {
+  private readonly seoService = inject(SeoService);
+
   private readonly pageSize = 5;
 
   protected readonly currentPage = signal(0);
@@ -33,6 +37,8 @@ export class HomePage implements OnInit {
   protected readonly loadError = signal(false);
 
   ngOnInit(): void {
+    this.seoService.setHomePage();
+
     this.articleApiService.getPublishedArticles(0, this.pageSize).subscribe({
       next: (response) => {
         const [featuredArticle, ...remainingArticles] = response.content;

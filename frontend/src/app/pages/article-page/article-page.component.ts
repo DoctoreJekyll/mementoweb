@@ -1,17 +1,14 @@
 import { DatePipe } from '@angular/common';
-
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Component, computed, inject, signal, type OnDestroy, type OnInit } from '@angular/core';
+import { Component, computed, inject, signal, type OnInit } from '@angular/core';
 
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { Meta, Title } from '@angular/platform-browser';
-
 import { ArticleApiService } from '../../articles/article-api.service';
 import { ArticleDetail } from '../../articles/article-detail';
-
 import { ArticleMarkdownService } from '../../articles/article-markdown.service';
+import { SeoService } from '../../core/seo.service';
 
 @Component({
   selector: 'app-article-page',
@@ -19,17 +16,14 @@ import { ArticleMarkdownService } from '../../articles/article-markdown.service'
   templateUrl: './article-page.component.html',
   styleUrl: './article-page.component.scss',
 })
-export class ArticlePage implements OnInit, OnDestroy {
-  private readonly titleService = inject(Title);
-
-  private readonly metaService = inject(Meta);
-
+export class ArticlePage implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   private readonly articleApiService = inject(ArticleApiService);
 
-  private readonly defaultDescription =
-    'Ensayos y reflexiones sobre videojuegos, cultura y memoria.';
+  private readonly articleMarkdownService = inject(ArticleMarkdownService);
+
+  private readonly seoService = inject(SeoService);
 
   protected readonly article = signal<ArticleDetail | null>(null);
 
@@ -38,8 +32,6 @@ export class ArticlePage implements OnInit, OnDestroy {
   protected readonly notFound = signal(false);
 
   protected readonly loadError = signal(false);
-
-  private readonly articleMarkdownService = inject(ArticleMarkdownService);
 
   protected readonly bodyHtml = computed(() =>
     this.articleMarkdownService.toSafeHtml(this.article()?.body),
@@ -52,7 +44,7 @@ export class ArticlePage implements OnInit, OnDestroy {
       this.loadError.set(true);
       this.isLoading.set(false);
 
-      this.titleService.setTitle('Error al cargar el artículo | Memento vivere');
+      this.seoService.setErrorPage();
 
       return;
     }
@@ -61,7 +53,7 @@ export class ArticlePage implements OnInit, OnDestroy {
       next: (article) => {
         this.article.set(article);
 
-        this.updateArticleMetadata(article);
+        this.seoService.setArticlePage(article);
 
         this.isLoading.set(false);
       },
@@ -70,33 +62,15 @@ export class ArticlePage implements OnInit, OnDestroy {
         if (error.status === 404) {
           this.notFound.set(true);
 
-          this.titleService.setTitle('Artículo no encontrado | Memento vivere');
+          this.seoService.setNotFoundPage();
         } else {
           this.loadError.set(true);
 
-          this.titleService.setTitle('Error al cargar el artículo | Memento vivere');
+          this.seoService.setErrorPage();
         }
 
         this.isLoading.set(false);
       },
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.metaService.updateTag({
-      name: 'description',
-      content: this.defaultDescription,
-    });
-  }
-
-  private updateArticleMetadata(article: ArticleDetail): void {
-    const description = article.excerpt.trim() || this.defaultDescription;
-
-    this.titleService.setTitle(`${article.title} | Memento vivere`);
-
-    this.metaService.updateTag({
-      name: 'description',
-      content: description,
     });
   }
 }
