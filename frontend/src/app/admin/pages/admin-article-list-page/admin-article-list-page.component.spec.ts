@@ -37,7 +37,7 @@ describe('AdminArticleListPage', () => {
     PageResponse<AdminArticleSummary> = {
       content: [article],
       page: 0,
-      size: 10,
+      size: 5,
       totalElements: 1,
       totalPages: 1
     };
@@ -134,7 +134,7 @@ describe('AdminArticleListPage', () => {
     fixture.detectChanges();
 
     expect(requestedPage).toBe(0);
-    expect(requestedSize).toBe(10);
+    expect(requestedSize).toBe(5);
     expect(requestedStatus).toBe('DRAFT');
 
     expect(

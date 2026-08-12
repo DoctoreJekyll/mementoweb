@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of } from 'rxjs';
 import { vi } from 'vitest';
 
 import { AdminAuthService } from '../../auth/admin-auth.service';
@@ -14,6 +15,8 @@ describe('AdminLayout', () => {
 
   const logout = vi.fn(() => {
     username.set(null);
+
+    return of(undefined);
   });
 
   beforeEach(async () => {
@@ -22,10 +25,13 @@ describe('AdminLayout', () => {
 
     await TestBed.configureTestingModule({
       imports: [AdminLayout],
+
       providers: [
         provideRouter([]),
+
         {
           provide: AdminAuthService,
+
           useValue: {
             username: username.asReadonly(),
             logout,
@@ -35,7 +41,6 @@ describe('AdminLayout', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminLayout);
-
     component = fixture.componentInstance;
 
     fixture.detectChanges();
