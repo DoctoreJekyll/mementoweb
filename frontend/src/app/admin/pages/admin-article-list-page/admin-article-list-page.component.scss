@@ -1,9 +1,6 @@
 :host {
   display: block;
-  width: min(
-    calc(100% - 2rem),
-    var(--content-width)
-  );
+  width: min(calc(100% - 2rem), var(--content-width));
   margin-inline: auto;
 }
 
@@ -262,4 +259,81 @@
   color: var(--color-muted);
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.markdown-guide {
+  margin-top: 0.75rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.markdown-guide summary {
+  padding: 0.85rem 1rem;
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.markdown-guide[open] summary {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.markdown-guide__content {
+  padding: 1rem;
+}
+
+.markdown-guide__content > p {
+  margin-bottom: 1rem;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.markdown-guide__examples {
+  margin: 0;
+}
+
+.markdown-guide__example {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+  padding-block: 0.75rem;
+  gap: 1rem;
+  border-top: 1px solid var(--color-line);
+}
+
+.markdown-guide__example:first-child {
+  border-top: 0;
+}
+
+.markdown-guide__example dt {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.markdown-guide__example dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.markdown-guide code,
+.markdown-guide pre {
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.markdown-guide code {
+  font-size: 0.8125rem;
+}
+
+.markdown-guide pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .markdown-guide__example {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
 }

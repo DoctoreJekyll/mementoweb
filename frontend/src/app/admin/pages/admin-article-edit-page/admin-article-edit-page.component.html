@@ -393,11 +393,109 @@
 
       <div class="form-field">
         <label for="article-body"> Cuerpo </label>
+
         <p class="form-field__help">
-          Separa los párrafos dejando una línea en blanco. Para añadir un enlace utiliza
-          <code>[nombre de la fuente](https://ejemplo.com)</code>. También puedes usar **negrita**,
-          *cursiva*, ## subtítulos, listas y &gt; citas.
+          Escribe el contenido utilizando Markdown. Separa los párrafos dejando una línea en blanco.
         </p>
+
+        <details class="markdown-guide">
+          <summary>Ver guía y ejemplos de Markdown</summary>
+
+          <div class="markdown-guide__content">
+            <p>
+              Utiliza solamente los formatos mostrados aquí. El título principal del artículo se
+              añade automáticamente.
+            </p>
+
+            <dl class="markdown-guide__examples">
+              <div class="markdown-guide__example">
+                <dt>Párrafos</dt>
+
+                <dd>
+                  <pre><code>Primer párrafo.
+
+Segundo párrafo.</code></pre>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Negrita</dt>
+
+                <dd>
+                  <code>**texto importante**</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Cursiva</dt>
+
+                <dd>
+                  <code>*texto en cursiva*</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Subtítulo principal</dt>
+
+                <dd>
+                  <code>## Nombre del apartado</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Subtítulo secundario</dt>
+
+                <dd>
+                  <code>### Nombre del subapartado</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Enlace</dt>
+
+                <dd>
+                  <code>[nombre de la fuente](https://ejemplo.com)</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Lista</dt>
+
+                <dd>
+                  <pre><code>- Primer elemento
+- Segundo elemento
+- Tercer elemento</code></pre>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Lista numerada</dt>
+
+                <dd>
+                  <pre><code>1. Primer elemento
+2. Segundo elemento
+3. Tercer elemento</code></pre>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Cita</dt>
+
+                <dd>
+                  <code>&gt; Texto de la cita</code>
+                </dd>
+              </div>
+
+              <div class="markdown-guide__example">
+                <dt>Separador</dt>
+
+                <dd>
+                  <code>---</code>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </details>
 
         <textarea
           id="article-body"
