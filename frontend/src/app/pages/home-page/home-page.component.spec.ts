@@ -79,7 +79,7 @@ describe('HomePage', () => {
     fixture.detectChanges();
 
     expect(requestedPage).toBe(0);
-    expect(requestedSize).toBe(10);
+    expect(requestedSize).toBe(5);
 
     const compiled =
       fixture.nativeElement as HTMLElement;

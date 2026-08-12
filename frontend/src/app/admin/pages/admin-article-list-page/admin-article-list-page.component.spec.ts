@@ -87,7 +87,7 @@ describe('AdminArticleListPage', () => {
     createComponent();
 
     expect(requestedPage).toBe(0);
-    expect(requestedSize).toBe(10);
+    expect(requestedSize).toBe(5);
     expect(requestedStatus).toBeUndefined();
 
     const compiled =
