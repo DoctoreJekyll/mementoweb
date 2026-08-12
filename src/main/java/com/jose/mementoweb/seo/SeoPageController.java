@@ -1,16 +1,13 @@
 package com.jose.mementoweb.seo;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.jose.mementoweb.domain.article.Article;
 import com.jose.mementoweb.exception.PublishedArticleNotFoundException;
@@ -30,19 +27,18 @@ public class SeoPageController {
 
     private final SeoHtmlRenderer seoHtmlRenderer;
 
-    private final String publicBaseUrl;
+    private final PublicUrlBuilder publicUrlBuilder;
 
     public SeoPageController(
             PublicArticleService publicArticleService,
             SeoHtmlRenderer seoHtmlRenderer,
-            @Value("${app.public-base-url}") String publicBaseUrl) {
+            PublicUrlBuilder publicUrlBuilder) {
 
         this.publicArticleService = publicArticleService;
 
         this.seoHtmlRenderer = seoHtmlRenderer;
 
-        this.publicBaseUrl = normalizePublicBaseUrl(
-                publicBaseUrl);
+        this.publicUrlBuilder = publicUrlBuilder;
     }
 
     @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
@@ -52,7 +48,7 @@ public class SeoPageController {
                 "Memento vivere — "
                         + "Videojuegos, cultura y memoria",
                 DEFAULT_DESCRIPTION,
-                publicBaseUrl + "/",
+                publicUrlBuilder.homeUrl(),
                 "index, follow",
                 "website",
                 null,
@@ -67,7 +63,8 @@ public class SeoPageController {
     public ResponseEntity<String> articlePage(
             @PathVariable String slug) {
 
-        String canonicalUrl = buildArticleUrl(slug);
+        String canonicalUrl = publicUrlBuilder.articleUrl(
+                slug);
 
         try {
             Article article = publicArticleService
@@ -116,7 +113,7 @@ public class SeoPageController {
                 "Área editorial | Memento vivere",
                 "Administración editorial "
                         + "de Memento vivere.",
-                publicBaseUrl + "/admin",
+                publicUrlBuilder.adminUrl(),
                 "noindex, nofollow, noarchive",
                 "website",
                 null,
@@ -137,62 +134,5 @@ public class SeoPageController {
                 .body(
                         seoHtmlRenderer.render(
                                 metadata));
-    }
-
-    private String buildArticleUrl(
-            String slug) {
-
-        return UriComponentsBuilder
-                .fromUriString(publicBaseUrl)
-                .pathSegment(
-                        "articulos",
-                        slug)
-                .build()
-                .encode()
-                .toUriString();
-    }
-
-    private static String normalizePublicBaseUrl(
-            String value) {
-
-        if (value == null
-                || value.isBlank()) {
-
-            throw new IllegalStateException(
-                    "Public base URL must be configured");
-        }
-
-        String normalized = value.trim();
-
-        while (normalized.endsWith("/")) {
-            normalized = normalized.substring(
-                    0,
-                    normalized.length() - 1);
-        }
-
-        URI uri;
-
-        try {
-            uri = URI.create(normalized);
-        } catch (IllegalArgumentException exception) {
-            throw new IllegalStateException(
-                    "Public base URL is invalid",
-                    exception);
-        }
-
-        boolean hasAllowedScheme = "http".equalsIgnoreCase(
-                uri.getScheme())
-                || "https".equalsIgnoreCase(
-                        uri.getScheme());
-
-        if (!hasAllowedScheme
-                || uri.getHost() == null) {
-
-            throw new IllegalStateException(
-                    "Public base URL must be an "
-                            + "absolute HTTP or HTTPS URL");
-        }
-
-        return normalized;
     }
 }
